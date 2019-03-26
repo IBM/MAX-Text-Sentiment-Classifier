@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.org/IBM/MAX-Text-Sentiment-Classifier) 
+[![Build Status](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier) 
 
 # IBM Developer Model Asset Exchange: Text Sentiment Classifier
 
