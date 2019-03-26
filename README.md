@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.org/IBM/MAX-Text-Sentiment-Classifier) 
+
 # IBM Developer Model Asset Exchange: Text Sentiment Classifier
 
 This repository contains code to instantiate and deploy a text sentiment classifier. This model is able to detect whether a text fragment leans towards a positive or a negative sentiment. Optimal input examples for this model are short strings (preferably a single sentence) with correct grammar, although not a requirement.
@@ -36,8 +38,8 @@ The generalization results (first row) are very good when the input data is simi
 ## Licenses
 | Component | License | Link  |
 | ------------- | --------  | -------- |
-| This repository | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.ibm.com/CODAIT/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
-| Finetuned Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.ibm.com/CODAIT/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
+| This repository | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/IBM/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
+| Finetuned Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/IBM/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
 | Pre-trained Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/google-research/bert/blob/master/LICENSE) |
 | Model Code (3rd party) | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/google-research/bert/blob/master/LICENSE) |
 | IBM Claims Stance Dataset for finetuning | [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/) | [LICENSE 1](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml#Project) <br> [LICENSE 2](https://en.wikipedia.org/wiki/Wikipedia:Copyrights#Reusers.27_rights_and_obligations)|
@@ -67,7 +69,7 @@ You can also deploy the model on Kubernetes using the latest docker image on Doc
 On your Kubernetes cluster, run the following commands:
 
 ```
-$ kubectl apply -f https://github.ibm.com/CODAIT/MAX-Text-Sentiment-Classifier/raw/master/max-text-sentiment-classifier.yaml
+$ kubectl apply -f https://github.com/IBM/MAX-Text-Sentiment-Classifier/raw/master/max-text-sentiment-classifier.yaml
 ```
 
 The model will be available internally at port `5000`, but can also be accessed externally through the `NodePort`.
@@ -84,7 +86,7 @@ The model will be available internally at port `5000`, but can also be accessed 
 Clone this repository locally. In a terminal, run the following command:
 
 ```
-$ git clone https://github.ibm.com/CODAIT/MAX-Text-Sentiment-Classifier.git
+$ git clone https://github.com/IBM/MAX-Text-Sentiment-Classifier.git
 ```
 
 Change directory into the repository base folder:
