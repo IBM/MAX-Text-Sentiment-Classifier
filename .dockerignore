@@ -1,0 +1,14 @@
+README.*
+.idea/
+.git/
+.gitignore
+tests/
+.pytest_cache
+tests/
+assets/.pytest_cache
+venv/
+assets/sentiment_BERT_base_uncased/
+assets/assets.tar.gz
+assets/sentiment_BERT_base_uncased.zip
+benchmark_model/
+docs/
