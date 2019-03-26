@@ -4,7 +4,7 @@
 
 The original pre-trained model files are from the [BERT](https://github.com/google-research/bert) repository, where they are available under [Apache 2.0](https://github.com/google-research/bert/blob/master/LICENSE). This pre-trained model was then finetuned on the [IBM Claim Stance Dataset](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml).
 
-_Note: the finetuned model files are hosted on [IBM Cloud Object Storage](http://max-assets.s3-api.us-geo.objectstorage.softlayer.net/max-text-sentiment-classifier/v1.0.0/assets.tar.gz)._
+_Note: the finetuned model files are hosted on [IBM Cloud Object Storage](http://max-assets.s3-api.us-geo.objectstorage.softlayer.net/max-text-sentiment-classifier/1.0/assets.tar.gz)._
 
 ## Test Examples (assets/test-examples.tsv)
 
