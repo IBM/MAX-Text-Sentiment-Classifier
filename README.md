@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier) 
+[![Build Status](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier) [![API demo](https://img.shields.io/website/http/max-text-sentiment-classifier.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=API%20demo&down_message=down&up_message=up)](http://max-text-sentiment-classifier.max.us-south.containers.appdomain.cloud/)
 
 # IBM Developer Model Asset Exchange: Text Sentiment Classifier
 
