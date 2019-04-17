@@ -67,57 +67,35 @@ class ModelWrapper(MAXModelWrapper):
         tensor_segment_ids = self.sess.graph.get_tensor_by_name('segment_ids_1:0')
         tensor_outputs = self.sess.graph.get_tensor_by_name('loss/Softmax:0')
 
-        # Grab the examples, convert to features, and create batches
+        # Grab the examples, convert to features, and create batches. In the loop,
+        # Go over all examples in chunks of size `predict_batch_size`.
         predictions = []
-        batch = {}
-        for i, example in enumerate(predict_examples):
 
-            # convert example to feature
-            input_ids, input_mask, label_ids, segment_ids = convert_single_example(i, example, self.label_list,
-                                                                                   self.max_seq_length, self.tokenizer)
+        for i in range(0, len(predict_examples), predict_batch_size):
+            examples = predict_examples[i:i+predict_batch_size]
 
-            # add to batch
-            if batch == {}:
-                batch['tensor_input_ids'] = np.array(input_ids).reshape(-1, self.max_seq_length)
-                batch['tensor_input_mask'] = np.array(input_mask).reshape(-1, self.max_seq_length)
-                batch['tensor_label_ids'] = np.array(label_ids)
-                batch['tensor_segment_ids'] = np.array(segment_ids).reshape(-1, self.max_seq_length)
-            else:
-                batch['tensor_input_ids'] = np.vstack(
-                    [batch['tensor_input_ids'], np.array(input_ids).reshape(-1, self.max_seq_length)])
-                batch['tensor_input_mask'] = np.vstack(
-                    [batch['tensor_input_mask'], np.array(input_mask).reshape(-1, self.max_seq_length)])
-                batch['tensor_label_ids'] = np.vstack([batch['tensor_label_ids'], np.array(label_ids)])
-                batch['tensor_segment_ids'] = np.vstack(
-                    [batch['tensor_segment_ids'], np.array(segment_ids).reshape(-1, self.max_seq_length)])
+            tf.logging.info(
+                f"{i} out of {len(predict_examples)} examples done ({round(i * 100 / len(predict_examples))}%).")
 
-            if batch['tensor_input_ids'].shape[0] == predict_batch_size:
-                # Make a prediction
-                result = self.sess.run(tensor_outputs, feed_dict={
-                    tensor_input_ids: batch['tensor_input_ids'],
-                    tensor_input_mask: batch['tensor_input_mask'],
-                    tensor_label_ids: batch['tensor_label_ids'].reshape(-1, ),
-                    tensor_segment_ids: batch['tensor_segment_ids'],
-                })
-                # Add the predictions
-                predictions.extend(result)
-                # Emtpy the batch
-                batch = {}
+            # Convert example to feature in batches.
+            input_ids, input_mask, label_ids, segment_ids = zip(
+                *tuple(convert_single_example(i + j, example, self.label_list, self.max_seq_length, self.tokenizer)
+                       for j, example in enumerate(examples)))
 
-            if i > 0 and i % 100 == 0:
-                tf.logging.info(
-                    f"example {i} out of {len(predict_examples)} done ({round(i * 100 / len(predict_examples))}%).")
+            # Convert to a format that is consistent with input tensors
+            feed_dict = {}
+            feed_dict[tensor_input_ids] = np.vstack(
+                tuple(np.array(arr).reshape(-1, self.max_seq_length) for arr in input_ids))
+            feed_dict[tensor_input_mask] = np.vstack(
+                tuple(np.array(arr).reshape(-1, self.max_seq_length) for arr in input_mask))
+            feed_dict[tensor_label_ids] = np.vstack(
+                tuple(np.array(arr) for arr in label_ids)).flatten()
+            feed_dict[tensor_segment_ids] = np.vstack(
+                tuple(np.array(arr).reshape(-1, self.max_seq_length) for arr in segment_ids))
 
-        # The last batch
-        if batch != {}:
             # Make a prediction
-            result = self.sess.run(tensor_outputs, feed_dict={
-                tensor_input_ids: batch['tensor_input_ids'],
-                tensor_input_mask: batch['tensor_input_mask'],
-                tensor_label_ids: batch['tensor_label_ids'].reshape(-1, ),
-                tensor_segment_ids: batch['tensor_segment_ids'],
-            })
+            result = self.sess.run(tensor_outputs, feed_dict=feed_dict)
             # Add the predictions
-            predictions.extend(result)
+            predictions.extend(p.tolist() for p in result)
 
-        return [[p[0], p[1]] for p in predictions]
+        return predictions
