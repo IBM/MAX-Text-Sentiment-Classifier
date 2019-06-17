@@ -16,7 +16,7 @@
 
 FROM codait/max-base:v1.1.3
 
-ARG model_bucket=http://s3.us-south.cloud-object-storage.appdomain.cloud/max-assets-prod/max-text-sentiment-classifier/1.0.0
+ARG model_bucket=https://s3.us-south.cloud-object-storage.appdomain.cloud/max-assets-prod/max-text-sentiment-classifier/1.0.0
 ARG model_file=assets.tar.gz
 
 RUN wget -nv --show-progress --progress=bar:force:noscroll ${model_bucket}/${model_file} --output-document=assets/${model_file} && \
