@@ -1,1 +1,1 @@
-# TODO  Add packages that the model training code requires when it is executed by WML
+tensorflow == 1.12.2

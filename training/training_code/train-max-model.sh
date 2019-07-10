@@ -48,6 +48,16 @@ if [ ! -d ${DATA_DIR} ]; then
   exit $ENV_ERROR_RETURN_CODE
 fi
 
+# Verify whether the DATA_DIR contains only one tsv file, and assign it to the TRAINING_DATA variable.
+tsv_count=`ls ${DATA_DIR}/*.tsv 2>/dev/null | wc -l`
+if [ $tsv_count -gt 1 ]; then
+    echo "ERROR: There are multiple .tsv files present in the data directory."
+    exit $ENV_ERROR_RETURN_CODE
+else
+    # Assign it to the TRAIN_DATA variable
+    TRAINING_DATA=`ls ${DATA_DIR}/*.tsv`
+fi
+
 # RESULT_DIR identifies the directory where the training output is stored.
 # The specified directory must exist and be writable.
 if [ -z ${RESULT_DIR+x} ]; then
@@ -79,18 +89,41 @@ echo "Training data is stored in $DATA_DIR"
 echo "Training work files and results will be stored in $RESULT_DIR"
 
 # Install prerequisite packages
-# IBM TODO: add required packages to the file 
-# 
 echo "Installing prerequisite packages ..."
 pip install -r training_requirements.txt
-
-# ---------------------------------------------------------------
-# Perform model training tasks
-# ---------------------------------------------------------------
 
 # Important: Trained model artifacts must be stored in ${RESULT_DIR}/model
 # Make sure the directory exists
 mkdir -p ${RESULT_DIR}/model
+
+# ---------------------------------------------------------------
+# Perform training environment setup tasks
+# ---------------------------------------------------------------
+
+MODEL_DOWNLOAD_BASE="https://storage.googleapis.com/bert_models/2018_10_18/"
+MODEL_FILE="uncased_L-12_H-768_A-12.zip"
+MODEL_FOLDER="uncased_L-12_H-768_A-12"
+
+ENVIRONMENT_SETUP_CMD="python3 prepare_environment.py --DATA_DIR=${DATA_DIR} --RESULT_DIR=${RESULT_DIR} --MODEL_DOWNLOAD_BASE=${MODEL_DOWNLOAD_BASE} --MODEL_FILE=${MODEL_FILE} --MODEL_FOLDER=${MODEL_FOLDER}"
+
+# display environment setup command
+echo "Running environment setup command \"$ENVIRONMENT_SETUP_CMD\""
+
+# run environment setup command
+$ENVIRONMENT_SETUP_CMD
+
+# capture return code
+RETURN_CODE=$?
+if [ $RETURN_CODE -gt 0 ]; then
+  echo "Error: Environment setup run exited with status code $RETURN_CODE"
+  exit $TRAINING_FAILED_RETURN_CODE
+fi
+
+echo "Environment setup completed."
+
+# ---------------------------------------------------------------
+# Perform model training tasks
+# ---------------------------------------------------------------
 
 echo "# ************************************************************"
 echo "# Training model ..."
@@ -100,7 +133,7 @@ echo "# ************************************************************"
 #           the training_code directory
 # Example: "python3 train-dcgan.py --dataset ${DATA_DIR}/aligned --epoch 20"
 # start training and capture return code
-TRAINING_CMD=""
+TRAINING_CMD="python3 finetune.py --data_type=tsv --train_data=${TRAINING_DATA} --output_dir=${RESULT_DIR} --pretrained_model_folder=${MODEL_FOLDER}"
 
 # display training command
 echo "Running training command \"$TRAINING_CMD\""
@@ -118,14 +151,6 @@ fi
 
 echo "Training completed. Output is stored in $RESULT_DIR."
 
-# ---------------------------------------------------------------
-# IBM TODO:
-# Add post processing code as necessary; for example
-#  - patch the TensorFlow checkpoint file (if applicable)
-#  - convert the trained model into other formats
-#  - ... 
-# ---------------------------------------------------------------
-
 echo "# ************************************************************"
 echo "# Post processing ..."
 echo "# ************************************************************"
@@ -133,32 +158,6 @@ echo "# ************************************************************"
 # according to WML coding guidelines the trained model should be 
 # saved in ${RESULT_DIR}/model
 cd ${RESULT_DIR}/model
-
-#
-# Post processing for serialized TensorFlow models: 
-# If the output of the training run is a TensorFlow checkpoint, patch it. 
-#
-
-if [ -d ${RESULT_DIR}/model/checkpoint ]; then 
-  # the training run created a directory named checkpoint
-  if [ -f ${RESULT_DIR}/model/checkpoint/checkpoint ]; then
-    # this directory contains a checkpoint file; patch it
-    mv ${RESULT_DIR}/model/checkpoint/checkpoint ${RESULT_DIR}/model/checkpoint/checkpoint.bak
-    sed 's:/.*/::g' ${RESULT_DIR}/model/checkpoint/checkpoint.bak > ${RESULT_DIR}/model/checkpoint/checkpoint
-    if [ $? -gt 0 ]; then
-      echo "[Post processing] Warning. Patch of TensorFlow checkpoint file failed. "
-      mv ${RESULT_DIR}/model/checkpoint/checkpoint.bak ${RESULT_DIR}/model/checkpoint/checkpoint
-    else
-      echo "[Post processing] TensorFlow checkpoint file was successfully patched."
-      rm ${RESULT_DIR}/model/checkpoint/checkpoint.bak
-    fi
-  fi    
-fi  
-
-#
-# TODO: add custom code if required; e.g. to convert the
-#       trained model into other formats ...
-#
 
 # ---------------------------------------------------------------
 # Prepare for packaging
