@@ -229,13 +229,11 @@ class CustomDataProcessor(DataProcessor):
         examples = []
         for (i, line) in enumerate(lines):
             guid = "%s-%s" % (set_type, i)
-            print(line)
             text_a = tokenization.convert_to_unicode(line[0])
             if set_type == "test":
                 label = self.get_labels()[0]
             else:
                 label = tokenization.convert_to_unicode(line[1])
-            print(text_a, label)
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
         return examples

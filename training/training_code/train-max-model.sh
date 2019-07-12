@@ -155,7 +155,7 @@ echo "# ************************************************************"
 echo "# Post processing ..."
 echo "# ************************************************************"
 
-# according to WML coding guidelines the trained model should be 
+# according to WML coding guidelines the trained model should be
 # saved in ${RESULT_DIR}/model
 cd ${RESULT_DIR}/model
 
@@ -176,56 +176,18 @@ TRAINING_STAGING_DIR=${BASE_STAGING_DIR}/trained_model
 #
 mkdir -p $TRAINING_STAGING_DIR
 
-# TensorFlow-specific directories
-# IBM TODO: 
-#   1) Identify the serialization format that the model-serving Docker image uses
-#   2) Uncomment the appropriate variable assignment 
-#   3) Do NOT change the directory name
-#   4) Remove the TODO comment
-#MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/checkpoint
-#MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/frozen_graph_def
-#MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/saved_model
+MODEL_ARTIFACT_TARGET_PATH=${TRAINING_STAGING_DIR}/tensorflow/saved_model
 if [ -z ${MODEL_ARTIFACT_TARGET_PATH+x} ];
   then "Error. This script was not correctly customized."
   exit $CUSTOMIZATION_ERROR_RETURN_CODE
 fi
 mkdir -p $MODEL_ARTIFACT_TARGET_PATH
 
-#
-# 2. copy trained model artifacts to $MODEL_ARTIFACT_TARGET_PATH
-# IBM TODO: 
-#   1) Add commands that copy the model training artifacts from 
-#   ${RESULT_DIR}/model/... to $MODEL_ARTIFACT_TARGET_PATH
-#   2) Remove the TODO comment
-# Example for tensorflow checkpoint files:
-#if [ -d ${RESULT_DIR}/model/checkpoint ]; then
-#  cp -R ${RESULT_DIR}/model/checkpoint ${TRAINING_STAGING_DIR}/tensorflow/
-#fi
-# Example for tensorflow frozen graph files:
-#if [ -d ${RESULT_DIR}/model/frozen_graph_def ]; then
-#  cp -R ${RESULT_DIR}/model/frozen_graph_def ${TRAINING_STAGING_DIR}/tensorflow/
-#fi
-# Example for tensorflow saved_model files:
-#if [ -d ${RESULT_DIR}/model/saved_model ]; then
-#  cp -R ${RESULT_DIR}/model/saved_model ${TRAINING_STAGING_DIR}/tensorflow/
-#fi
-
-# The following files should now be present in BASE_STAGING_DIR
-#   trained_model/<framework-name>/<serialization-format>/file1
-#   trained_model/<framework-name>/<serialization-format>subdirectory/file2
-#   trained_model/<framework-name>/<serialization-format-2>file3
-#   trained_model/<framework-name-2>/<serialization-format>file4
-#   ...
-# Example:
-#   trained_model/tensorflow/checkpoint/checkpoint
-#   trained_model/tensorflow/checkpoint/DCGAN.model-21.meta
-#   trained_model/tensorflow/checkpoint/DCGAN.model-21.index
-#   trained_model/tensorflow/checkpoint/DCGAN.model-21.data-00000-of-00001
-#   trained_model/tensorflow/frozen_graph_def/frozen_inference_graph.pb
+# copy the model files to the appropriate directory
+cp -R ${RESULT_DIR}/model/. ${TRAINING_STAGING_DIR}/tensorflow/saved_model
 
 # ----------------------------------------------------------------------
 # Create a compressed TAR archive containing files from $BASE_STAGING_DIR
-# NO CODE CUSTOMIZATION SHOULD BE REQUIRED BEYOND THIS POINT
 # ----------------------------------------------------------------------
 
 echo "# ************************************************************"
@@ -237,7 +199,7 @@ OUTPUT_ARCHIVE=${RESULT_DIR}/model_training_output.tar.gz
 
 CWD=`pwd`
 cd $BASE_STAGING_DIR
-# Create compressed archive from $BASE_STAGING_DIR 
+# Create compressed archive from $BASE_STAGING_DIR
 echo "Creating downloadable archive \"$OUTPUT_ARCHIVE\"."
 tar cvfz ${OUTPUT_ARCHIVE} .
 RETURN_CODE=$?
