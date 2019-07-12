@@ -19,12 +19,6 @@
 # uncomment to enable debug output
 #set -x
 
-# --------------------------------------------------------------------
-#  Standard training wrapper script for Model Asset Exchange models
-#  Complete the following IBM customization steps and remove the TODO
-#  comments.
-# --------------------------------------------------------------------
-
 SUCCESS_RETURN_CODE=0
 TRAINING_FAILED_RETURN_CODE=1
 POST_PROCESSING_FAILED=2
@@ -129,9 +123,6 @@ echo "# ************************************************************"
 echo "# Training model ..."
 echo "# ************************************************************"
 
-# IBM TODO: Specify the training command; the cwd contains the files from 
-#           the training_code directory
-# Example: "python3 train-dcgan.py --dataset ${DATA_DIR}/aligned --epoch 20"
 # start training and capture return code
 TRAINING_CMD="python3 finetune.py --data_type=tsv --train_data=${TRAINING_DATA} --output_dir=${RESULT_DIR} --pretrained_model_folder=${MODEL_FOLDER}"
 
@@ -215,12 +206,3 @@ rm -rf $BASE_STAGING_DIR
 
 echo "Model training and packaging completed."
 exit $SUCCESS_RETURN_CODE
-
-#
-# Expected result:
-#  - $OUTPUT_ARCHIVE contains
-#     trained_model/<framework-name>/<serialization-format>/file1
-#     trained_model/<framework-name>/<serialization-format>subdirectory/file2
-#     trained_model/<framework-name>/<serialization-format-2>file3
-#     trained_model/<framework-name-2>/<serialization-format>file4
-#     ...
