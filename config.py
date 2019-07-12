@@ -25,11 +25,11 @@ SWAGGER_UI_DOC_EXPANSION = 'none'
 API_TITLE = 'MAX Text Sentiment Classifier'
 API_DESC = 'Detect the sentiment captured in short pieces of text. ' \
            'The model was finetuned on the IBM Project Debater Claim Sentiment dataset.'
-API_VERSION = '1.1.0'
+API_VERSION = '2.0.0'
 
 # default model
 MODEL_NAME = 'sentiment_BERT_base_uncased'
-DEFAULT_MODEL_PATH = 'assets/{}'.format(MODEL_NAME)
+DEFAULT_MODEL_PATH = 'assets'
 
 # the metadata of the model
 MODEL_META_DATA = {
