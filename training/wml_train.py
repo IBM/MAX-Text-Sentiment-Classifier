@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-#!/usr/bin/env python
+# !/usr/bin/env python
 
 import glob
 import os
