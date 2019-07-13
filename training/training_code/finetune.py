@@ -89,6 +89,7 @@ flags.DEFINE_integer("save_checkpoints_steps", 1000,
 flags.DEFINE_integer("iterations_per_loop", 1000,
                      "How many steps to make in each estimator call.")
 
+
 class InputExample(object):
     """A single training/test example for simple sequence classification."""
 

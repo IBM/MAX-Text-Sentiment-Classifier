@@ -124,7 +124,7 @@ echo "# Training model ..."
 echo "# ************************************************************"
 
 # start training and capture return code
-TRAINING_CMD="python3 finetune.py --data_type=tsv --train_data=${TRAINING_DATA} --output_dir=${RESULT_DIR} --pretrained_model_folder=${MODEL_FOLDER}"
+TRAINING_CMD="python3 finetune.py --num_train_epochs=10.0 --data_type=tsv --train_data=${TRAINING_DATA} --output_dir=${RESULT_DIR} --pretrained_model_folder=${MODEL_FOLDER}"
 
 # display training command
 echo "Running training command \"$TRAINING_CMD\""
