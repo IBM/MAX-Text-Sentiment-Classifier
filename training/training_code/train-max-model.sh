@@ -94,9 +94,8 @@ mkdir -p ${RESULT_DIR}/model
 # Perform training environment setup tasks
 # ---------------------------------------------------------------
 
-MODEL_DOWNLOAD_BASE="https://storage.googleapis.com/bert_models/2018_10_18/"
-MODEL_FILE="uncased_L-12_H-768_A-12.zip"
-MODEL_FOLDER="uncased_L-12_H-768_A-12"
+# Load training parameters (sourcing training-parameters.sh)
+source training-parameters.sh
 
 ENVIRONMENT_SETUP_CMD="python3 prepare_environment.py --DATA_DIR=${DATA_DIR} --RESULT_DIR=${RESULT_DIR} --MODEL_DOWNLOAD_BASE=${MODEL_DOWNLOAD_BASE} --MODEL_FILE=${MODEL_FILE} --MODEL_FOLDER=${MODEL_FOLDER}"
 
@@ -124,7 +123,7 @@ echo "# Training model ..."
 echo "# ************************************************************"
 
 # start training and capture return code
-TRAINING_CMD="python3 finetune.py --num_train_epochs=10.0 --data_type=tsv --train_data=${TRAINING_DATA} --output_dir=${RESULT_DIR} --pretrained_model_folder=${MODEL_FOLDER}"
+TRAINING_CMD="python3 finetune.py --num_train_epochs=${NUM_TRAIN_EPOCHS} --max_seq_length=${MAX_SEQ_LENGTH} --do_lower_case=${DO_LOWER_CASE} --train_batch_size=${TRAIN_BATCH_SIZE} --learning_rate=${LEARNING_RATE} --warmup_proportion=${WARMUP_PROPORTION} --data_type=tsv --train_data=${TRAINING_DATA} --output_dir=${RESULT_DIR} --pretrained_model_folder=${MODEL_FOLDER}"
 
 # display training command
 echo "Running training command \"$TRAINING_CMD\""
