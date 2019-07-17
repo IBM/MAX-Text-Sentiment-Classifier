@@ -63,9 +63,9 @@ def test_response():
 
     # verify that 'good string' is in fact positive
     print(response['predictions'][0])
-    assert round(float(response['predictions'][0][0]['positive'])) == 1
+    assert round(float(response['predictions'][0]['positive'])) == 1
     # verify that 'bad string' is in fact negative
-    assert round(float(response['predictions'][1][0]['negative'])) == 1
+    assert round(float(response['predictions'][1]['negative'])) == 1
 
     json_data2 = {
         "text": [
@@ -81,11 +81,11 @@ def test_response():
     assert response['status'] == 'ok'
 
     # verify that "2008 was a dark, dark year for stock markets worldwide." is in fact negative
-    assert round(float(response['predictions'][0][0]['positive'])) == 0
-    assert round(float(response['predictions'][0][0]['negative'])) == 1
+    assert round(float(response['predictions'][0]['positive'])) == 0
+    assert round(float(response['predictions'][0]['negative'])) == 1
     # verify that "The Model Asset Exchange is a crucial element of a developer's toolkit." is in fact positive
-    assert round(float(response['predictions'][1][0]['negative'])) == 0
-    assert round(float(response['predictions'][1][0]['positive'])) == 1
+    assert round(float(response['predictions'][1]['negative'])) == 0
+    assert round(float(response['predictions'][1]['positive'])) == 1
 
     # Test different input batch sizes
     for input_size in [4, 16, 32, 64, 75]:
