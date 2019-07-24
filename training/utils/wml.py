@@ -44,16 +44,17 @@ class WMLWrapper:
         if arf is None or not isinstance(arf, ApiRequestFailure):
             return None
 
-        debug('#Exception: {}#'.format(arf))
+        debug('WML ApiRequestFailure Exception: {}'.format(arf))
 
         if not arf.error_msg:
             return None
 
+        # holds the components of an ApiRequestFailure
         parsed_arf = {
             'raw_message_text': [],
-            'status_code': None,
-            'json_body': None,
-            'error_message': None
+            'status_code': None,   # HTTP status code
+            'json_body': None,     # a dict, if JSON message
+            'error_message': None  # raw error message
         }
         try:
             for line in arf.error_msg.split('\n'):
@@ -62,20 +63,28 @@ class WMLWrapper:
                              line)
                 if m:
                     parsed_arf['status_code'] = int(m.group(1))
-                    parsed_arf['json_body'] = json.loads(m.group(2))
-
-            if parsed_arf['json_body'].get('errors') and\
-               isinstance(parsed_arf['json_body']['errors'], list) and\
-               len(parsed_arf['json_body']['errors']) > 0:
-                parsed_arf['error_message'] = \
-                    parsed_arf['json_body']['errors'][0].get('message')
-            else:
-                parsed_arf['error_message'] = \
-                    '\n'.join(parsed_arf['raw_message_text'])
-
+                    try:
+                        # try to parse the error message if
+                        # it is JSON encoded
+                        parsed_arf['json_body'] = \
+                            json.loads(m.group(2))
+                        if parsed_arf['json_body'].get('errors') and\
+                           isinstance(parsed_arf['json_body']['errors'], list)\
+                                and\
+                           len(parsed_arf['json_body']['errors']) > 0:
+                            parsed_arf['error_message'] = \
+                                parsed_arf['json_body']['errors'][0]\
+                                .get('message')
+                        else:
+                            parsed_arf['error_message'] = \
+                                '\n'.join(parsed_arf['raw_message_text'])
+                    except Exception:
+                        # not JSON; use message body
+                        parsed_arf['error_message'] = m.group(2)
             return parsed_arf
         except Exception as ex:
-            debug('Error trying to parse ApiRequestFailure:')
+            print('Error trying to parse WML ApiRequestFailure: {}'
+                  .format(arf))
             debug(' Message: {}'.format(arf.error_msg))
             debug(' Exception:', ex)
 
@@ -308,3 +317,34 @@ class WMLWrapper:
                 details['entity']['training_results_reference']['location'])
         # the response did not contain the expected results
         return {}
+
+    def cancel_training(self,
+                        training_guid,
+                        not_found_ok=True):
+        """
+        Attempt to cancel the training run identified by training_guid
+
+        :param training_guid: training run to be canceled
+        :type training_guid: str
+        :param not_found_ok: no error if the training id is invalid,
+        defaults to True
+        :type not_found_ok: bool, optional
+        """
+
+        assert training_guid is not None, \
+            'Parameter training_guid cannot be None'
+
+        try:
+            self.client.training.cancel(training_guid)
+        except ApiRequestFailure as arf:
+            debug('Exception type: {}'.format(type(arf)))
+            debug('Exception: {}'.format(arf))
+            p = WMLWrapper.parse_WML_ApiRequestFailure(arf)
+            if p and p.get('status_code') == 404 and not_found_ok:
+                return
+            raise WMLWrapperError(arf)
+        except Exception as ex:
+            debug('Exception type: {}'.format(type(ex)))
+            debug('Exception: {}'.format(ex))
+            raise WMLWrapperError(ex)
+        return

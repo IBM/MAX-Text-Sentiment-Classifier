@@ -54,7 +54,7 @@ class YAMLHandler:
             key_prefix = self.cfg_key_prefix
         else:
             key_prefix = None
-        for file in glob.iglob(path + '/*', recursive=True):
+        for file in glob.iglob(path + '/**/*', recursive=True):
             if os.path.isfile(file):
                 print(' [MESSAGE] Uploading "{}" to training data bucket '
                       '"{}" ...'.format(file, bucket_name))

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Copyright 2018-2019 IBM Corp. All Rights Reserved.
 #
@@ -13,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# !/usr/bin/env python
 
 import glob
 import os
@@ -207,7 +206,7 @@ if cmd_parameters['command'] == 'package' and training_guid is not None:
         print('Error. Cloud Object Storage preparation failed: {}'.format(cwe))
         sys.exit(ExitCode.PRE_PROCESSING_FAILED.value)
 
-    print_banner('Verifying that "{}" is a valid training id...'
+    print_banner('Verifying that "{}" is a valid training id ...'
                  .format(training_guid))
 
     try:
@@ -564,47 +563,72 @@ else:
 # --------------------------------------------------------
 #
 
-print('Training status is updated every {} seconds - '
-      '(p)ending (r)unning (e)rror (c)ompleted: '
+print('Checking model training status every {} seconds.'
+      ' Press Ctrl+C to terminate monitoring.'
       .format(config['training_progress_monitoring_interval']))
+print('Status - (p)ending (r)unning (e)rror (c)ompleted or canceled:')
 
 try:
 
     training_in_progress = True
     while training_in_progress:
-        # poll training status; ignore server errors (e.g. caused by temporary
-        # issues not specific to our training run)
-        status = w.get_training_status(training_guid, ignore_server_error=True)
-        if status:
-            training_status = status.get('state') or '?'
-        else:
-            # unknown status; continue and leave it up to the user to terminate
-            # monitoring
-            training_status = '?'
-        # display training status indicator
-        #  [p]ending
-        #  [r]unning
-        #  [c]ompleted
-        #  [e]rror
-        #  [?]
-        print(training_status[0:1], end='', flush=True)
-        if training_status == 'completed':
-            # training completed successfully
-            print('\nTraining completed.')
-            training_in_progress = False
-        elif training_status == 'error':
-            print('\nTraining failed.')
-            # training ended with error
-            training_in_progress = False
-        else:
-            time.sleep(int(config['training_progress_monitoring_interval']))
-except KeyboardInterrupt:
-    print('Monitoring was stoppped, but model training will continue.')
-    print('To resume monitoring, run "python {} {} {} {}"'
-          .format(sys.argv[0], sys.argv[1], 'package', training_guid))
-    sys.exit(ExitCode.TRAINING_FAILED.value)
+        try:
+            # poll training status; ignore server errors (e.g. caused
+            # by temporary issues not specific to our training run)
+            status = w.get_training_status(training_guid,
+                                           ignore_server_error=True)
+            if status:
+                training_status = status.get('state') or '?'
+            else:
+                # unknown status; continue and leave it up to the user
+                # to terminate monitoring
+                training_status = '?'
+            # display training status indicator
+            #  [p]ending
+            #  [r]unning
+            #  [c]ompleted
+            #  [e]rror
+            #  [?]
+            print(training_status[0:1], end='', flush=True)
+            if training_status == 'completed':
+                # training completed successfully
+                print('\nTraining completed.')
+                training_in_progress = False
+            elif training_status == 'error':
+                print('\nTraining failed.')
+                # training ended with error
+                training_in_progress = False
+            elif training_status == 'canceled':
+                print('\nTraining canceled.')
+                # training ended with error
+                training_in_progress = False
+            else:
+                time.sleep(
+                      int(config['training_progress_monitoring_interval']))
+        except KeyboardInterrupt:
+            print('\nTraining monitoring was stopped.')
+            try:
+                input('Press Ctrl+C again to cancel model training or '
+                      'any other key to continue training.')
+                print('To resume monitoring, run "python {} {} {} {}"'
+                      .format(sys.argv[0],
+                              sys.argv[1],
+                              'package',
+                              training_guid))
+                sys.exit(ExitCode.SUCCESS.value)
+            except KeyboardInterrupt:
+                try:
+                    w.cancel_training(training_guid)
+                    print('\nModel training was canceled.')
+                except Exception as ex:
+                    print('Model training could not be canceled: {}'
+                          .format(ex))
+                    debug(' Exception type: {}'.format(type(ex)))
+                    debug(' Exception: {}'.format(ex))
+                sys.exit(ExitCode.TRAINING_FAILED.value)
 except Exception as ex:
-    print('Error. Model training monitoring failed with an exception:')
+    print('Error. Model training monitoring failed with an exception: {}'
+          .format(ex))
     debug(' Exception type: {}'.format(type(ex)))
     debug(' Exception: {}'.format(ex))
     sys.exit(ExitCode.TRAINING_FAILED.value)
@@ -653,10 +677,10 @@ try:
                                     config['local_download_directory'],
                                     results_references['model_location'])
 
-    if training_status == 'error':
-        # Training ended with an error. Notify the user where the training log
-        # file was stored and exit.
-        print('Please review the training log file "{}" in "{}"'
+    if training_status in ['error', 'canceled']:
+        # Training ended with an error or was canceled.
+        # Notify the user where the training log file was stored and exit.
+        print('The training log file "{}" was saved in "{}".'
               .format(TRAINING_LOG_NAME,
                       config['local_download_directory']))
         sys.exit(ExitCode.TRAINING_FAILED.value)
