@@ -9,7 +9,7 @@ MODEL_FOLDER="uncased_L-12_H-768_A-12"
 DO_LOWER_CASE=true  # changing this parameter also requires changing the same parameter in `core/model.py` for inference
 MAX_SEQ_LENGTH=128  # changing this parameter also requires changing the same parameter in `core/model.py` for inference
 # general:
-NUM_TRAIN_EPOCHS=10.0
-TRAIN_BATCH_SIZE=16
+NUM_TRAIN_EPOCHS=1
+TRAIN_BATCH_SIZE=32
 WARMUP_PROPORTION=0.1
 LEARNING_RATE=0.00005

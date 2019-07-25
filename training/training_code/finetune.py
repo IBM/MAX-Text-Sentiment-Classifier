@@ -819,9 +819,16 @@ def finetune(_):
     file_based_convert_examples_to_features(
         train_examples, label_list, FLAGS.max_seq_length, tokenizer, train_file)
     tf.logging.info("***** Running training *****")
-    tf.logging.info("  Num examples = %d", len(train_examples))
-    tf.logging.info("  Batch size = %d", FLAGS.train_batch_size)
-    tf.logging.info("  Num steps = %d", num_train_steps)
+    params = f"  Num examples = {len(train_examples)}\n" \
+        f"  Batch size = {FLAGS.train_batch_size}\n" \
+        f"  Num steps = {num_train_steps}\n" \
+        f"  Epochs = {FLAGS.num_train_epochs}\n" \
+        f"  Learning rate = {FLAGS.learning_rate}\n" \
+        f"  warmup_proportion = {FLAGS.warmup_proportion}\n" \
+        f"  max_seq_length = {FLAGS.max_seq_length}\n" \
+        f"  do_lower_case = {FLAGS.do_lower_case}"
+    tf.logging.info(params)
+    print(params)
     train_input_fn = file_based_input_fn_builder(
         input_file=train_file,
         seq_length=FLAGS.max_seq_length,

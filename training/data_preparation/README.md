@@ -22,5 +22,5 @@ video game violence is not related to serious aggressive behavior in real life	p
 some violent video games may actually have a prosocial effect in some contexts	pos
 ```
 
-This dataset is part of the [IBM Claim Stance Dataset](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml) and [IBM Project Debater](https://www.research.ibm.com/artificial-intelligence/project-debater/), and is licensed under
+This dataset is part of the [IBM Claim Stance Dataset](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml) and [IBM Project Debater](https://www.research.ibm.com/artificial-intelligence/project-debater/) (first 1000 lines), and is licensed under
 [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/) ([LICENSE 1](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml#Project), [LICENSE 2](https://en.wikipedia.org/wiki/Wikipedia:Copyrights#Reusers.27_rights_and_obligations)).
