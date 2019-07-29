@@ -4,7 +4,7 @@ This document provides instructions to train the model on Watson Machine Learnin
 
 - [Prepare Data for Training](#prepare-data-for-training)
 - [Train the Model](#train-the-model)
-- [Rebuild the Model Serving Microservice](#rebuild-the-model-serving-microservice)
+- [Rebuild the Model-Serving Microservice](#rebuild-the-model-serving-microservice)
 
 ## Prepare Data for Training
 
@@ -39,7 +39,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    ```
 
    $ ls *.yaml
-     <max-text-classifier-training-config.yaml> 
+     max-text-classifier-training-config.yaml 
    ```
 
 1. Configure your environment for model training. Run `wml_setup.py` and follow the prompts.
