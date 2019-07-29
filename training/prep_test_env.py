@@ -16,6 +16,7 @@
 
 import os
 import glob
+from pathlib import Path
 
 from ruamel.yaml import YAML
 from utils.cos import COSWrapper
@@ -52,7 +53,9 @@ cw.clear_bucket(os.environ.get('COS_INPUT_BUCKET'))
 cw.clear_bucket(os.environ.get('COS_OUTPUT_BUCKET'))
 
 # upload sample training data to the bucket
-for fp in glob.glob('sample_training_data/*'):
-    cw.upload_file(file_name=fp,
-                   bucket_name=os.environ.get('COS_INPUT_BUCKET'),
-                   key_name=fp.replace('sample_training_data/', ''))
+for fp in Path('sample_training_data/').glob('**/*'):
+    fp = str(fp)
+    if not os.path.isdir(fp):
+        cw.upload_file(file_name=fp,
+                       bucket_name=os.environ.get('COS_INPUT_BUCKET'),
+                       key_name=fp.replace('sample_training_data/', ''))
