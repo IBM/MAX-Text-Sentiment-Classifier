@@ -19,18 +19,18 @@ as part of the [IBM Developer Model Asset Exchange](https://developer.ibm.com/ex
 ## Benchmark
 In the table below, the prediction accuracy of the model on the test sets of three different datasets is listed. 
 
-The first row showcases the generalization power of our model after finetuning on the IBM Claims Dataset.
- The Sentiment140 (Tweets) and IMDB Reviews datasets are only used for evaluating the transfer-learning capabilities of this model. The implementation in this repository was **not** trained or finetuned on the Sentiment140 or IMDB reviews datasets.
+The first row showcases the generalization power of our model after fine-tuning on the IBM Claims Dataset.
+ The Sentiment140 (Tweets) and IMDB Reviews datasets are only used for evaluating the transfer-learning capabilities of this model. The implementation in this repository was **not** trained or fine-tuned on the Sentiment140 or IMDB reviews datasets.
  
-The second row describes the performance of the BERT-Base (English - Uncased) model when finetuned on the specific task. This was done simply for reference, and the weights are therefore not made available.
+The second row describes the performance of the BERT-Base (English - Uncased) model when fine-tuned on the specific task. This was done simply for reference, and the weights are therefore not made available.
 
 
-The generalization results (first row) are very good when the input data is similar to the data used for finetuning (e.g. Sentiment140 (tweets) when finetuned on the IBM Claims Dataset). However, when a different style of text is given as input, and with a longer median length (e.g. multi-sentence IMDB reviews), the results are not as good.
+The generalization results (first row) are very good when the input data is similar to the data used for fine-tuning (e.g. Sentiment140 (tweets) when fine-tuned on the IBM Claims Dataset). However, when a different style of text is given as input, and with a longer median length (e.g. multi-sentence IMDB reviews), the results are not as good.
 
 | Model Type | IBM Claims | Sentiment140 | IMDB Reviews |
 | ------------- | --------  | -------- | -------------- | 
-| This model (finetuned on IBM Claims) | 94% | 83.84% | 81% |
-| Models finetuned on the specific dataset | 94% | 84% | 90% |
+| This model (fine-tuned on IBM Claims) | 94% | 83.84% | 81% |
+| Models fine-tuned on the specific dataset | 94% | 84% | 90% |
 
 ## References
 * _J. Devlin, M. Chang, K. Lee, K. Toutanova_, [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805), arXiv, 2018.
@@ -41,10 +41,10 @@ The generalization results (first row) are very good when the input data is simi
 | Component | License | Link  |
 | ------------- | --------  | -------- |
 | This repository | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/IBM/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
-| Finetuned Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/IBM/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
+| Fine-tuned Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/IBM/MAX-Text-Sentiment-Classifier/blob/master/LICENSE) |
 | Pre-trained Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/google-research/bert/blob/master/LICENSE) |
 | Model Code (3rd party) | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](https://github.com/google-research/bert/blob/master/LICENSE) |
-| IBM Claims Stance Dataset for finetuning | [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/) | [LICENSE 1](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml#Project) <br> [LICENSE 2](https://en.wikipedia.org/wiki/Wikipedia:Copyrights#Reusers.27_rights_and_obligations)|
+| IBM Claims Stance Dataset for fine-tuning | [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/) | [LICENSE 1](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml#Project) <br> [LICENSE 2](https://en.wikipedia.org/wiki/Wikipedia:Copyrights#Reusers.27_rights_and_obligations)|
 
 ## Pre-requisites:
 * `docker`: The [Docker](https://www.docker.com/) command-line interface. Follow the [installation instructions](https://docs.docker.com/install/) for your system.
