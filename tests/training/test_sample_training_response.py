@@ -18,35 +18,6 @@ import pytest
 import requests
 
 
-def test_swagger():
-
-    model_endpoint = 'http://localhost:5000/swagger.json'
-
-    r = requests.get(url=model_endpoint)
-    assert r.status_code == 200
-    assert r.headers['Content-Type'] == 'application/json'
-
-    json = r.json()
-    assert 'swagger' in json
-    assert json.get('info') and json.get('info').get('title') == 'MAX Text Sentiment Classifier'
-
-
-def test_metadata():
-
-    model_endpoint = 'http://localhost:5000/model/metadata'
-
-    r = requests.get(url=model_endpoint)
-    assert r.status_code == 200
-
-    metadata = r.json()
-    assert metadata['id'] == 'max-text-sentiment-classifier'
-    assert metadata['name'] == 'Bert Base Uncased TensorFlow Model'
-    assert metadata['description'] == 'BERT Base finetuned on the IBM Project Debater Claim Sentiment dataset.'
-    assert metadata['license'] == 'Apache V2'
-    assert metadata['type'] == 'Text Classification'
-    assert 'developer.ibm.com' in metadata['source']
-
-
 def test_response():
 
     # test code 200
