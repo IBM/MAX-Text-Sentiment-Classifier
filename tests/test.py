@@ -62,7 +62,6 @@ def test_response():
     assert response['status'] == 'ok'
 
     # verify that 'good string' is in fact positive
-    print(response['predictions'][0])
     assert round(float(response['predictions'][0]['positive'])) == 1
     # verify that 'bad string' is in fact negative
     assert round(float(response['predictions'][1]['negative'])) == 1

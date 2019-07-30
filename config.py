@@ -28,7 +28,7 @@ API_DESC = 'Detect the sentiment captured in short pieces of text. ' \
 API_VERSION = '2.0.0'
 
 # default model
-MODEL_NAME = 'sentiment_BERT_base_uncased'
+MODEL_NAME = API_TITLE
 DEFAULT_MODEL_PATH = 'assets'
 
 # the metadata of the model
