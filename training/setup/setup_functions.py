@@ -28,7 +28,31 @@ class InstanceHandler:
         with open('setup/config.json') as config_file:
             self.data = json.load(config_file)
 
-    def available_instance(self, which_resource, resource_id): # noqa
+    def get_instance_details(self, response, which_resource,
+                             inter_list, count):
+        """
+        Get details of the available instances.
+        :param response: response from the request
+        :param which_resource: `wml` or `cos`.
+        :param inter_list: intermediate list holding details about
+                           the resources.
+        :param count: number of resources retrieved.
+        :return: intermediate list and resources count.
+        """
+        for index, value in enumerate(response['resources'], start=1):
+            # check instances under the specified resource
+            for index_1, plan in \
+                    enumerate(value['plan_history'], start=1):
+                for key, values in \
+                        enumerate(self.data[which_resource].items()):
+                    if plan['resource_plan_id'] == values[1]:
+                        count += 1
+                        inter_list.append([count, value['name'],
+                                           value['region_id'],
+                                           values[0], value['guid']])
+        return inter_list, count
+
+    def available_instance(self, which_resource, resource_group_id): # noqa
         """
         This function retrieves available instances of
         specified service and prompts user to select the instance
@@ -44,17 +68,25 @@ class InstanceHandler:
            directly to instance creation step.
         :param which_resource: under which service, standard service
                resource plan id needs to be searched.
-        :param resource_id: under which resource, availability of
-               instances need to be searched.
+        :param resource_group_id: under which resource group, availability
+                                  of instances need to be searched.
         :return: List of existing instances, guids and
                  selected option. Exit on error
         """
+        if which_resource == 'wml':
+            resource_id = self.data['resource-id']['wml']
+        elif which_resource == 'cos':
+            resource_id = self.data['resource-id']['cos']
+        resource_param = {
+            "resource_group_id": resource_group_id,
+            "resource_id": resource_id
+        }
         headers = {
             'Authorization': self.iam_access_token,
         }
         response = requests.get("https://resource-controller."
                                 "cloud.ibm.com/v2/resource_instances",
-                                headers=headers)
+                                headers=headers, params=resource_param)
         if response.status_code == 200:
             response = response.json()
             # list to append existing instances
@@ -62,23 +94,42 @@ class InstanceHandler:
             # list to append existing guids
             existing_guids = []
             count = 0
+            next_page_flag = 'N'
+            inter_list = []
+            inter_list, count = \
+                self.get_instance_details(response,
+                                          which_resource,
+                                          inter_list,
+                                          count)
             # retrieve instances available under
-            for index, value in enumerate(response['resources'], start=1):
-                # check instances under the specified resource id
-                if value['resource_group_id'] == resource_id:
-                    for index_1, plan in \
-                            enumerate(value['plan_history'], start=1):
-                        for key, values in \
-                                enumerate(self.data[which_resource].items()):
-                            if plan['resource_plan_id'] == values[1]:
-                                count += 1
-                                print("{:2d}. Instance Name: {}   |  "
-                                      "Instance Location: {}  | "
-                                      "Instance Plan: {} ".
-                                      format(int(count), value['name'],
-                                             value['region_id'], values[0]))
-                                existing_instances.append(value['name'])
-                                existing_guids.append(value['guid'])
+            if response['next_url'] is not None:
+                next_page_flag = 'Y'
+            while True:
+                if next_page_flag == 'N':
+                    break
+                else:
+                    response = requests.get("https://resource-controller."
+                                            "cloud.ibm.com" +
+                                            response['next_url'],
+                                            headers=headers)
+                    if response.status_code == 200:
+                        response = response.json()
+                        inter_list, count = \
+                            self.get_instance_details(response,
+                                                      which_resource,
+                                                      inter_list,
+                                                      count)
+                        if response['next_url'] is None:
+                            next_page_flag = 'N'
+            inter_list.sort(key=lambda x: x[1].casefold())
+            for list_index, list_val in enumerate(inter_list, start=1):
+                print("{:2d}. Instance Name: {}   |  "
+                      "Instance Location: {}  | "
+                      "Instance Plan: {} ".
+                      format(list_index, list_val[1], list_val[2],
+                             list_val[3]))
+                existing_instances.append(list_val[1])
+                existing_guids.append(list_val[4])
             # Adding create new instance option.
             if len(existing_instances) > 0:
                 print('{:2d}. {}'.format(int(count) + 1,
@@ -104,15 +155,29 @@ class InstanceHandler:
                         return existing_instances, instance_option, \
                                existing_guids
             else:
-                existing_instances = ['Create New Instance']
-                instance_option = '1'
-                existing_guids = ['Create New Guid']
-                return existing_instances, instance_option, existing_guids
+                return ['Create New Instance'], '1', ['Create New Guid']
 
         else:
             print("[DEBUG] Failing with status code:", response.status_code)
             print("[DEBUG] Reason for failure:", response.reason)
             sys.exit()
+
+    def wml_key_details(self, available_keys, count,
+                        inter_wml_list):
+        """
+        Get details of the WML keys matching guid of the instance.
+        :param available_keys: response from the request
+        :param count: count to track number of retrieved keys
+                      under the selected instance.
+        :param inter_wml_list: intermediate list holding details of
+                               the key retrieved.
+        :return: intermediate list and count
+        """
+        for index, key in enumerate(available_keys['resources'], start=1):
+            count += 1
+            inter_wml_list.append([count, key['name'], key['guid']])
+
+        return inter_wml_list, count
 
     def wml_key_check(self, instance_guid): # noqa
         """
@@ -129,28 +194,50 @@ class InstanceHandler:
             'Authorization': self.iam_access_token,
         }
         available_keys = requests.get("https://resource-controller.cloud."
-                                      "ibm.com/v2/resource_keys",
+                                      "ibm.com/v2/resource_instances/"
+                                      + instance_guid +
+                                      "/resource_keys",
                                       headers=headers)
         if available_keys.status_code == 200:
             available_keys = available_keys.json()
             # list for storing existing keys and list
             existing_keys = []
             existing_keys_guid = []
+            inter_wml_list = []
             count = 0
-            for index, key in enumerate(available_keys['resources'], start=1):
-                try:
-                    # Check if provided instance guid matches with current
-                    if key['credentials']['instance_id'] == instance_guid:
-                        count += 1
-                        print("{:2d}. {}".format(count, key['name']))
-                        existing_keys.append(key['name'])
-                        existing_keys_guid.append(key['guid'])
-                except KeyError:
-                    continue
+            next_page_flag = 'N'
+            inter_wml_list, count = \
+                self.wml_key_details(available_keys,
+                                     count,
+                                     inter_wml_list)
+            if available_keys['next_url'] is not None:
+                next_page_flag = 'Y'
+            while True:
+                if next_page_flag == 'N':
+                    break
+                else:
+                    available_keys = requests.get("https://resource-"
+                                                  "controller.cloud.ibm"
+                                                  ".com" +
+                                                  available_keys['next_url'],
+                                                  headers=headers)
+                    if available_keys.status_code == 200:
+                        available_keys = available_keys.json()
+                        inter_wml_list, count = \
+                            self.wml_key_details(available_keys,
+                                                 count,
+                                                 inter_wml_list)
+                        if available_keys['next_url'] is None:
+                            next_page_flag = 'N'
+
+            inter_wml_list.sort(key=lambda x: x[1].casefold())
+            for list_index, list_val in enumerate(inter_wml_list, start=1):
+                print("{:2d}. Key Name: {} ".format(list_index, list_val[1]))
+                existing_keys.append(list_val[1])
+                existing_keys_guid.append(list_val[2])
             print('{:2d}. {}'.format(count + 1,
                                      '* Create New Service Credentials *'))
             existing_keys.append('Create New Key')
-
             if len(existing_keys) > 0:
                 while True:
                     key_option = input("[PROMPT] Your selection:  ").strip()
@@ -163,16 +250,30 @@ class InstanceHandler:
                     else:
                         return existing_keys, key_option, existing_keys_guid
             else:
-                existing_keys = ['Create New Key']
-                key_option = '1'
-                existing_keys_guid = []
-                return existing_keys, key_option, existing_keys_guid
+                return ['Create New Key'], '1', []
         else:
             print('[DEBUG] key not present')
             print("[DEBUG] Failing with status code:",
                   available_keys.status_code)
             print("[DEBUG] Reason for failure:", available_keys.reason)
             sys.exit()
+
+    def cos_key_details(self, available_keys,
+                        inter_cos_list, count):
+        """
+        Get details of the COS keys matching guid of the instance.
+        :param available_keys: response from the request
+        :param inter_cos_list: intermediate list holding details of
+                               the key retrieved.
+        :param count: count to track number of retrieved keys
+                      under the selected instance.
+        :return: intermediate list and count
+        """
+        for index, k in enumerate(available_keys['resources'], start=1):
+            count += 1
+            inter_cos_list.append([count, k['name'], k['guid']])
+
+        return inter_cos_list, count
 
     def cos_key_check(self, instance_guid): # noqa
         """
@@ -190,31 +291,46 @@ class InstanceHandler:
             'Authorization': self.iam_access_token,
         }
         available_keys = requests.get("https://resource-controller."
-                                      "cloud.ibm.com/v2/resource_keys",
+                                      "cloud.ibm.com/v2/resource_instances/"
+                                      + instance_guid +
+                                      "/resource_keys",
                                       headers=headers)
         if available_keys.status_code == 200:
             available_keys = available_keys.json()
             # list for storing existing keys and list
             existing_keys = []
-            existing_key_guid = []
+            existing_keys_guid = []
+            inter_cos_list = []
             count = 0
-            for k in available_keys['resources']:
-                try:
-                    # Check if provided instance guid matches with current
-                    instance_id = k['resource_instance_url'].split('/')[-1]
-                    if instance_id == instance_guid:
-                        count += 1
-                        print("{:2d}. {}".format(count, k['name']))
-                        existing_keys.append(k['name'])
-                        existing_key_guid.append(k['guid'])
-                except KeyError:
-                    continue
-            if len(existing_keys) > 0:
-                print('{:2d}. {}'.format(int(count) + 1,
-                                         '* Create New Service Credentials *'))
-            else:
-                print('{:2d}. {}'.format(1,
-                                         '* Create New Service Credentials *'))
+            next_page_flag = 'N'
+            inter_cos_list, count = \
+                self.cos_key_details(available_keys,
+                                     inter_cos_list, count)
+            if available_keys['next_url'] is not None:
+                next_page_flag = 'Y'
+            while True:
+                if next_page_flag == 'N':
+                    break
+                else:
+                    available_keys = requests.get("https://resource-"
+                                                  "controller.cloud."
+                                                  "ibm.com" +
+                                                  available_keys['next_url'],
+                                                  headers=headers)
+                    if available_keys.status_code == 200:
+                        available_keys = available_keys.json()
+                        inter_cos_list, count = \
+                            self.cos_key_details(available_keys,
+                                                 inter_cos_list, count)
+                        if available_keys['next_url'] is None:
+                            next_page_flag = 'N'
+            inter_cos_list.sort(key=lambda x: x[1].casefold())
+            for list_index, list_val in enumerate(inter_cos_list, start=1):
+                print("{:2d}. Key Name: {} ".format(list_index, list_val[1]))
+                existing_keys.append(list_val[1])
+                existing_keys_guid.append(list_val[2])
+            print('{:2d}. {}'.format(count + 1,
+                                     '* Create New Service Credentials *'))
             existing_keys.append('Create New Key')
             # Prompt for user input
             if len(existing_keys) > 0:
@@ -228,13 +344,9 @@ class InstanceHandler:
                         continue
                     else:
                         return existing_keys, key_option, \
-                               existing_key_guid
+                               existing_keys_guid
             else:
-                existing_keys = ['Create New Key']
-                key_option = '1'
-                existing_key_guid = []
-                return existing_keys, key_option, \
-                    existing_key_guid
+                return ['Create New Key'], '1', []
         else:
             print('[DEBUG] key not present')
             print("[DEBUG] Failing with status code:",

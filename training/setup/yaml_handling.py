@@ -49,12 +49,15 @@ class YAMLHandler:
         `False` if file upload fails.
         """
         file_count = 0
+        ignore_list = [(os.path.join(path, 'README.md'))]
         if (self.cfg_key_prefix != '' or self.cfg_key_prefix
                 is not None):
             key_prefix = self.cfg_key_prefix
         else:
             key_prefix = None
         for file in glob.iglob(path + '/**/*', recursive=True):
+            if file in ignore_list:
+                continue
             if os.path.isfile(file):
                 print(' [MESSAGE] Uploading "{}" to training data bucket '
                       '"{}" ...'.format(file, bucket_name))
@@ -162,7 +165,7 @@ class YAMLHandler:
                     sys.exit()
                 else:
                     print('[MESSAGE] Uploaded files to training data bucket '
-                          '"{}".'.format(upload_path))
+                          '"{}".'.format(bucket_name))
                     return upload_path
             else:
                 print("[MESSAGE] WARNING: Proceeding without data upload")
@@ -206,7 +209,7 @@ class YAMLHandler:
                             sys.exit()
                         else:
                             print('[MESSAGE] Uploaded files to training '
-                                  'data bucket "{}".'.format(upload_path))
+                                  'data bucket "{}".'.format(bucket_name))
                             return upload_path
                     # proceed with existing data.
                     if user_choice == 3 and self.cfg_loc_path is None:
@@ -256,6 +259,13 @@ class YAMLHandler:
             return len(bucket_list), None, None
 
     def get_new_input_bucket(self, bucket_list, bucket_list_length):
+        """
+        Prompt user for new input bucket name.
+        :param bucket_list: existing bucket list
+        :param bucket_list_length: number of buckets.
+        :return: new input bucket name and local directory path
+                 from where the data was uploaded.
+        """
         while True:
             try:
                 new_input_bucket_name = input("[PROMPT] Please "
@@ -295,7 +305,7 @@ class YAMLHandler:
                       "data bucket name")
                 continue
 
-    def input_bucket_handle(self): # noqa
+    def input_bucket_handle(self):  # noqa
         """
         Handle input bucket data.
         1. If input bucket is not configured.
@@ -327,28 +337,36 @@ class YAMLHandler:
         print(message)
 
         if self.cfg_inp_bucket is None:
-            # Get list of available buckets.
-            bucket_list_length, input_new_bucket, bucket_list = \
-                self.bucket_list()
-            # No available bucket or user wants to create a new bucket
-            if bucket_list_length == 0 or (int(input_new_bucket) > 0 and
-                                           int(input_new_bucket) ==
-                                           (bucket_list_length + 1)):
-                # get new bucket name
-                return self.get_new_input_bucket(
-                    bucket_list, bucket_list_length)
-            # Using the existing bucket
-            elif int(input_new_bucket) != (bucket_list_length + 1):
-                config_inp_bucket = bucket_list[int(input_new_bucket) - 1]
-                print("[MESSAGE] Using existing bucket '{}' "
-                      "as training data bucket. "
-                      .format(config_inp_bucket))
-                local_directory_path = self.bucket_data_handling(
-                    config_inp_bucket)
-                return config_inp_bucket, local_directory_path
-            else:
-                print("[DEBUG] Error in handling input COS bucket")
-                return None, None
+            while True:
+                # Get list of available buckets.
+                bucket_list_length, input_new_bucket, bucket_list = \
+                    self.bucket_list()
+                # No available bucket or user wants to create a new bucket
+                if bucket_list_length == 0 or (int(input_new_bucket) > 0 and
+                                               int(input_new_bucket) ==
+                                               (bucket_list_length + 1)):
+                    # get new bucket name
+                    return self.get_new_input_bucket(
+                        bucket_list, bucket_list_length)
+                elif (int(input_new_bucket) != (bucket_list_length + 1) and
+                      bucket_list[int(input_new_bucket) - 1] ==
+                      self.cfg_out_bucket):
+                    print("[MESSAGE] Selected bucket has been configured as "
+                          "the result bucket. Please choose a different "
+                          "bucket or create a new bucket")
+                    continue
+                # Using the existing bucket
+                elif int(input_new_bucket) != (bucket_list_length + 1):
+                    config_inp_bucket = bucket_list[int(input_new_bucket) - 1]
+                    print("[MESSAGE] Using existing bucket '{}' "
+                          "as training data bucket. "
+                          .format(config_inp_bucket))
+                    local_directory_path = self.bucket_data_handling(
+                        config_inp_bucket)
+                    return config_inp_bucket, local_directory_path
+                else:
+                    print("[DEBUG] Error in handling input COS bucket")
+                    return None, None
         else:
             # Steps if bucket is configured.
             print("Training data bucket:  {} ".
@@ -440,13 +458,13 @@ class YAMLHandler:
                 if not bucket_clean_choice.isdigit() or \
                    int(bucket_clean_choice) < 1 or \
                    int(bucket_clean_choice) > 2:
-                    print("[MESSAGE] Enter a number between 1 and 2.")
+                    print("[MESSAGE] Enter 1 or 2.")
                     continue
                 if int(bucket_clean_choice) == 1:
                     self.cos.clear_bucket(result_bucket)
                 break
 
-    def new_bucket_creation(self, input_bucket_name): # noqa
+    def new_bucket_creation(self, input_bucket_name):  # noqa
         """
         1. Prompt user a new bucket name, if there is no existing
         bucket or user selects option to create a new bucket.
@@ -470,6 +488,9 @@ class YAMLHandler:
                           "names can not be same. Enter a "
                           "valid result bucket name.")
                     continue
+                elif new_input_bucket_name == '':
+                    print("[MESSAGE] Bucket name is required")
+                    continue
                 else:
                     result_bucket_check = \
                         self.cos.create_bucket(
@@ -489,7 +510,7 @@ class YAMLHandler:
                       "result bucket name.")
                 continue
 
-    def result_bucket_handle(self, input_bucket_name): # noqa
+    def result_bucket_handle(self, input_bucket_name):  # noqa
         """
         Handle result bucket.
         1. If result bucket is not configured:
@@ -537,7 +558,7 @@ class YAMLHandler:
                               "result bucket name: ").strip()
                     if result_bucket == '':
                         continue
-                    if bucket_list_length != 0 and \
+                    elif bucket_list_length != 0 and \
                             result_bucket in bucket_list:
                         print("[MESSAGE] A bucket with this name "
                               "already exists.")
