@@ -4,7 +4,7 @@ This document provides instructions to train the model on Watson Machine Learnin
 
 - [Prepare Data for Training](#prepare-data-for-training)
 - [Train the Model](#train-the-model)
-- [Rebuild the Model-Serving Microservice](#rebuild-the-model-serving-microservice)
+- [Rebuild the Model Serving Microservice](#rebuild-the-model-serving-microservice)
 
 ## Prepare Data for Training
 
@@ -27,6 +27,7 @@ Open a terminal window, change dir into `$MODEL_REPO_HOME_DIR/training` and inst
    ```
 
 ### Customize Model Specific Parameters
+
 If you wish to change the network architecture or training hyper-parameters like `epochs` etc, change the corresponding arguments in `$MODEL_REPO_HOME_DIR/training/training_code/training-parameters.sh`.
 
 
@@ -39,24 +40,23 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    ```
 
    $ ls *.yaml
-     max-text-classifier-training-config.yaml 
+     max-text-classifier-training-config.yaml
    ```
 
-1. Configure your environment for model training. Run `wml_setup.py` and follow the prompts.
+2. Configure your environment for model training. Run `wml_setup.py` and follow the prompts.
 
    ```
-    $ python wml_setup.py max-text-classifier-training-config.yaml 
+    $ python wml_setup.py max-text-classifier-training-config.yaml
      ...
    ```
    
-1. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service. 
+3. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service. 
 
    MacOS example:
 
    ```
    $ export ML_INSTANCE=...
-   $ export ML_USERNAME=...
-   $ export ML_PASSWORD=...
+   $ export ML_APIKEY=...
    $ export ML_ENV=...
    $ export AWS_ACCESS_KEY_ID=...
    $ export AWS_SECRET_ACCESS_KEY=...
@@ -83,7 +83,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
     - Training data is present in the Cloud Object Storage bucket that Watson Machine Learning will access to train the model.
     - The model training code is packaged in a ZIP file named `max-text-classifier-model-building-code.zip` that Watson Machine Learning uses to train the model.
 
-1. Start model training.
+2. Start model training.
 
    ```
    $ python wml_train.py max-text-classifier-training-config.yaml package
@@ -102,7 +102,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    
     > Take note of the training id.
 
-1. Monitor the model training progress.
+3. Monitor the model training progress.
 
    ```
    ...
@@ -137,11 +137,11 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
      training-log.txt 
    ```
 
-1. Return to the parent directory
+4. Return to the parent directory
 
 ### Rebuild the Model-Serving Microservice
 
-To serve the model trained on your own dataset you have to rebuild the Docker image:
+The model-serving microservice out of the box serves the pre-trained model which was trained on [insert_standard_dataset_here](dataset_URL). To serve the model trained on your dataset you have to rebuild the Docker image:
 
 1. [Build the Docker image](https://docs.docker.com/engine/reference/commandline/build/):
 
@@ -152,7 +152,7 @@ To serve the model trained on your own dataset you have to rebuild the Docker im
    
    > If the optional parameter `use_pre_trained_model` is set to `true` or if the parameter is not defined the Docker image will be configured to serve the pre-trained model.
    
-1. Once the Docker image build completes start the microservice by [running the container](https://docs.docker.com/engine/reference/commandline/run/):
+2. Once the Docker image build completes start the microservice by [running the container](https://docs.docker.com/engine/reference/commandline/run/):
  
  ```
  $ docker run -it -p 5000:5000 max-text-classifier
