@@ -40,7 +40,7 @@ def test_metadata():
 
     metadata = r.json()
     assert metadata['id'] == 'max-text-sentiment-classifier'
-    assert metadata['name'] == 'Bert Base Uncased TensorFlow Model'
+    assert metadata['name'] == 'MAX Text Sentiment Classifier'
     assert metadata['description'] == 'BERT Base finetuned on the IBM Project Debater Claim Sentiment dataset.'
     assert metadata['license'] == 'Apache V2'
     assert metadata['type'] == 'Text Classification'

@@ -81,7 +81,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
 
     - The required environment variables are defined.
     - Training data is present in the Cloud Object Storage bucket that Watson Machine Learning will access to train the model.
-    - The model training code is packaged in a ZIP file named ` max-text-classifier-model-building-code.zip` that Watson Machine Learning uses to train the model.
+    - The model training code is packaged in a ZIP file named `max-text-classifier-model-building-code.zip` that Watson Machine Learning uses to train the model.
 
 1. Start model training.
 

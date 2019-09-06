@@ -33,7 +33,7 @@ DEFAULT_MODEL_PATH = 'assets'
 # the metadata of the model
 MODEL_META_DATA = {
     'id': 'max-text-sentiment-classifier',
-    'name': 'Bert Base Uncased TensorFlow Model',
+    'name': 'MAX Text Sentiment Classifier',
     'description': 'BERT Base finetuned on the IBM Project Debater Claim Sentiment dataset.',
     'type': 'Text Classification',
     'source': 'https://developer.ibm.com/exchanges/models/all/max-text-sentiment-classifier/',
