@@ -1,5 +1,5 @@
-#
-# Copyright 2018-2019 IBM Corp. All Rights Reserved.
+# coding=utf-8
+# Copyright 2018 The Google AI Language Team Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +12,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-
-language: python
-python:
-  - 3.6
-services:
-  - docker
-install:
-  - docker build -t max-text-sentiment-classifier .
-  - docker run -it -d --rm -p 5000:5000 max-text-sentiment-classifier
-  - pip install pytest requests flake8
-before_script:
-  - sleep 30
-script:
-  - flake8 . --max-line-length=127
-  - pytest tests/test_api.py
-  - pytest tests/test_response.py

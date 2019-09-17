@@ -14,18 +14,30 @@
 # limitations under the License.
 #
 
-language: python
-python:
-  - 3.6
-services:
-  - docker
-install:
-  - docker build -t max-text-sentiment-classifier .
-  - docker run -it -d --rm -p 5000:5000 max-text-sentiment-classifier
-  - pip install pytest requests flake8
-before_script:
-  - sleep 30
-script:
-  - flake8 . --max-line-length=127
-  - pytest tests/test_api.py
-  - pytest tests/test_response.py
+import pytest
+import requests
+
+
+def test_response():
+
+    # test code 200
+    model_endpoint = 'http://localhost:5000/model/predict'
+
+    json_data = {
+        "text": ["good string",
+                 "bad string"]
+    }
+
+    r = requests.post(url=model_endpoint, json=json_data)
+
+    assert r.status_code == 200
+    response = r.json()
+    assert response['status'] == 'ok'
+
+    # test whether the labels have changed
+    assert 'pos' in response['predictions'][0].keys()
+    assert 'neg' in response['predictions'][0].keys()
+
+
+if __name__ == '__main__':
+    pytest.main([__file__])

@@ -1,3 +1,6 @@
+training/training_output/
+*-model-building-code.zip
+.idea/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

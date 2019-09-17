@@ -13,19 +13,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-language: python
-python:
-  - 3.6
-services:
-  - docker
-install:
-  - docker build -t max-text-sentiment-classifier .
-  - docker run -it -d --rm -p 5000:5000 max-text-sentiment-classifier
-  - pip install pytest requests flake8
-before_script:
-  - sleep 30
-script:
-  - flake8 . --max-line-length=127
-  - pytest tests/test_api.py
-  - pytest tests/test_response.py

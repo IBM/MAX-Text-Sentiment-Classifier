@@ -18,35 +18,6 @@ import pytest
 import requests
 
 
-def test_swagger():
-
-    model_endpoint = 'http://localhost:5000/swagger.json'
-
-    r = requests.get(url=model_endpoint)
-    assert r.status_code == 200
-    assert r.headers['Content-Type'] == 'application/json'
-
-    json = r.json()
-    assert 'swagger' in json
-    assert json.get('info') and json.get('info').get('title') == 'MAX Text Sentiment Classifier'
-
-
-def test_metadata():
-
-    model_endpoint = 'http://localhost:5000/model/metadata'
-
-    r = requests.get(url=model_endpoint)
-    assert r.status_code == 200
-
-    metadata = r.json()
-    assert metadata['id'] == 'max-text-sentiment-classifier'
-    assert metadata['name'] == 'Bert Base Uncased TensorFlow Model'
-    assert metadata['description'] == 'BERT Base finetuned on the IBM Project Debater Claim Sentiment dataset.'
-    assert metadata['license'] == 'Apache V2'
-    assert metadata['type'] == 'Text Classification'
-    assert 'developer.ibm.com' in metadata['source']
-
-
 def test_response():
     model_endpoint = 'http://localhost:5000/model/predict'
 
@@ -62,10 +33,9 @@ def test_response():
     assert response['status'] == 'ok'
 
     # verify that 'good string' is in fact positive
-    print(response['predictions'][0])
-    assert round(float(response['predictions'][0][0]['positive'])) == 1
+    assert round(float(response['predictions'][0]['positive'])) == 1
     # verify that 'bad string' is in fact negative
-    assert round(float(response['predictions'][1][0]['negative'])) == 1
+    assert round(float(response['predictions'][1]['negative'])) == 1
 
     json_data2 = {
         "text": [
@@ -81,11 +51,11 @@ def test_response():
     assert response['status'] == 'ok'
 
     # verify that "2008 was a dark, dark year for stock markets worldwide." is in fact negative
-    assert round(float(response['predictions'][0][0]['positive'])) == 0
-    assert round(float(response['predictions'][0][0]['negative'])) == 1
+    assert round(float(response['predictions'][0]['positive'])) == 0
+    assert round(float(response['predictions'][0]['negative'])) == 1
     # verify that "The Model Asset Exchange is a crucial element of a developer's toolkit." is in fact positive
-    assert round(float(response['predictions'][1][0]['negative'])) == 0
-    assert round(float(response['predictions'][1][0]['positive'])) == 1
+    assert round(float(response['predictions'][1]['negative'])) == 0
+    assert round(float(response['predictions'][1]['positive'])) == 1
 
     # Test different input batch sizes
     for input_size in [4, 16, 32, 64, 75]:

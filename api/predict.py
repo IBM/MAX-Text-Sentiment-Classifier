@@ -25,11 +25,12 @@ input_parser = MAX_API.model('ModelInput', {
                         description='List of claims (strings) to be analyzed for either a positive or negative sentiment.')
 })
 
+with open('assets/labels.txt', 'r') as f:
+    class_labels = [x.strip() for x in f]
+
 # Creating a JSON response model: https://flask-restplus.readthedocs.io/en/stable/marshalling.html#the-api-model-factory
-label_prediction = MAX_API.model('LabelPrediction', {
-    'positive': fields.Float(required=True, description='Class probability'),
-    'negative': fields.Float(required=True, description='Class probability'),
-})
+label_prediction = MAX_API.model('LabelPrediction',
+                                 {l: fields.Float(required=True, description='Class probability') for l in class_labels})
 
 predict_response = MAX_API.model('ModelPredictResponse', {
     'status': fields.String(required=True, description='Response status message'),
@@ -57,7 +58,7 @@ class ModelPredictAPI(PredictAPI):
                        "The json structure should have a 'text' field containing a list of strings")
 
         # Generate the output format for every input string
-        output = [[{'positive': p[0], 'negative': p[1]}] for p in preds]
+        output = [{l: p[i] for i, l in enumerate(class_labels)} for p in preds]
 
         result['predictions'] = output
         result['status'] = 'ok'
