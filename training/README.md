@@ -12,8 +12,13 @@ To prepare your data for training complete the steps listed in [data_preparation
 
 ## Train the Model
 
-In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g.
-`/users/hi_there/MAX-Text-Sentiment-Classifier`. 
+- [Install Local Prerequisites](#install-local-prerequisites)
+- [Run the Setup Script](#run-the-setup-script)
+- [Prepare Data for Training](#prepare-data-for-training)
+- [Customize Training](#customize-training)
+- [Train the Model Using Watson Machine Learning](#train-the-model-using-watson-machine-learning)
+
+In this document `$MODEL_REPO_HOME_DIR` refers to the cloned MAX model repository directory, e.g. `/users/gone_fishing/MAX-Text-Sentiment-Classifier`. 
 
 ### Install Local Prerequisites
 
@@ -26,14 +31,15 @@ Open a terminal window, change dir into `$MODEL_REPO_HOME_DIR/training` and inst
     ... 
    ```
 
-### Customize Model Specific Parameters
-
-If you wish to change the network architecture or training hyper-parameters like `epochs` etc, change the corresponding arguments in `$MODEL_REPO_HOME_DIR/training/training_code/training-parameters.sh`.
-
+The directory contains two Python scripts, `setup_max_model_training` and `train_max_model`, which you'll use to prepare your environment for model training and to perform model training on Watson Machine Learning.
 
 ### Run the Setup Script
 
-The `wml_setup.py` script prepares your local environment and your IBM Cloud resources for model training.
+To perform model training, you need access to a Watson Machine Learning service instance and a Cloud Object Storage service instance on IBM Cloud. The `setup_max_model_training` Python script prepares your IBM Cloud resources for model training and configures your local environment.
+
+#### Steps
+
+1. Open a terminal window.
 
 1. Locate the training configuration file. It is named `max-text-classifier-training-config.yaml`.
 
@@ -43,33 +49,68 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
      max-text-classifier-training-config.yaml
    ```
 
-2. Configure your environment for model training. Run `wml_setup.py` and follow the prompts.
+2. Run `setup_max_model_training` and follow the prompts to configure model training.
 
    ```
-    $ python wml_setup.py max-text-classifier-training-config.yaml
+    $ ./setup_max_model_training max-text-classifier-training-config.yaml
      ...
+     ------------------------------------------------------------------------------
+     Model training setup is complete and your configuration file was updated.
+     ------------------------------------------------------------------------------
+     Training data bucket name   : text-classifier-sample-input
+     Local data directory        : sample_training_data/
+     Training results bucket name: text-classifier-sample-output
+     Compute configuration       : k80     
    ```
+
+   On Microsoft Windows run `python setup_max_model_training max-text-classifier-training-config.yaml`.
+
+   The setup script updates the training configuration file using the information you've provided. For security reasons, confidential information, such as API keys or passwords, are _not_ stored in this file. Instead the script displays a set of environment variables that you must define to make this information available to the training script.
    
-3. After setup has completed, define the displayed environment variables. These variables provide the model training script with access credentials for your Watson Machine Learning service and Cloud Object Storage service. 
+3. Once setup is completed, define the displayed environment variables. The model training script `train_max_model` uses those variables to access your training resources.
 
-   MacOS example:
-
+   MacOS/Linux example:
+   
    ```
-   $ export ML_INSTANCE=...
    $ export ML_APIKEY=...
+   $ export ML_INSTANCE=...
    $ export ML_ENV=...
    $ export AWS_ACCESS_KEY_ID=...
    $ export AWS_SECRET_ACCESS_KEY=...
    ```
+
+   Microsoft Windows:
    
-   > The training script `wml_train.py` requires these environment variables. If they are not set, model training cannot be started.
+   ```
+   $ set ML_APIKEY=...
+   $ set ML_INSTANCE=...
+   $ set ML_ENV=...
+   $ set AWS_ACCESS_KEY_ID=...
+   $ set AWS_SECRET_ACCESS_KEY=...
+   ```
+
+   > If you re-run the setup script and select a different Watson Machine Learning service instance or Cloud Object Storage service instance the displayed values will change. The values do not change if you modify any other configuration setting, such as the input data bucket or the compute configuration.
+
+### Prepare Data for Training
+
+You can test the model training process using the sample data in the `sample_training_data` directory. To use your own data, follow the instructions in [data_preparation/README.md](data_preparation/README.md).
+
+### Customize Training
+
+If you wish to change the network architecture or training hyper-parameters like `epochs` etc, change the corresponding arguments in `$MODEL_REPO_HOME_DIR/training/training_code/training-parameters.sh`.
 
 ### Train the Model Using Watson Machine Learning
+
+The `train_max_model` script verifies your configuration settings, packages the model training code, uploads it to Watson Machine Learning, launches the training run, monitors the training run, and downloads the trained model artifacts.
+
+Complete the following steps in the terminal window where the earlier mentioned environment variables are defined. 
+
+#### Steps
 
 1. Verify that the training preparation steps complete successfully.
 
    ```
-    $ python wml_train.py max-text-classifier-training-config.yaml prepare
+    $ ./train_max_model max-text-classifier-training-config.yaml prepare
      ...
      # --------------------------------------------------------
      # Checking environment variables ...
@@ -77,16 +118,17 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
      ...
    ```
 
+   On Microsoft Windows run `python train_max_model max-text-classifier-training-config.yaml prepare`.
+
    If preparation completed successfully:
 
-    - The required environment variables are defined.
-    - Training data is present in the Cloud Object Storage bucket that Watson Machine Learning will access to train the model.
-    - The model training code is packaged in a ZIP file named `max-text-classifier-model-building-code.zip` that Watson Machine Learning uses to train the model.
+    - Training data is present in the Cloud Object Storage bucket that WML will access during model training.
+    - Model training code is packaged `max-text-classifier-model-building-code.zip`
 
-2. Start model training.
+1. Start model training.
 
    ```
-   $ python wml_train.py max-text-classifier-training-config.yaml package
+   $ ./train_max_model max-text-classifier-training-config.yaml package
     ...
     # --------------------------------------------------------
     # Starting model training ...
@@ -95,22 +137,35 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
     Training run name     : train-max-...
     Training data bucket  : ...
     Results bucket        : ...
-    Model-building archive: max-...-model-building-code.zip
+    Model-building archive: max-text-classifier-model-building-code.zip
     Model training was started. Training id: model-...
     ...
    ```
-   
-    > Take note of the training id.
 
-3. Monitor the model training progress.
+   > On Microsoft Windows run `python train_max_model max-text-classifier-training-config.yaml package`.
+
+1. Note the displayed `Training id`. It uniquely identifies your training run in Watson Machine Learning.
+
+1. Monitor training progress.
 
    ```
    ...
-   Training status is updated every 15 seconds - (p)ending (r)unning (e)rror (c)ompleted: 
+   Checking model training status every 15 seconds. Press Ctrl+C once to stop monitoring or  press Ctrl+C twice to cancel training.
+   Status - (p)ending (r)unning (e)rror (c)ompleted or canceled:
    ppppprrrrrrr...
    ```
 
-   > Training continues should your training script get disconnected (e.g. because you terminated the script or lost network connectivity). You can resume monitoring by running `python wml_train.py max-text-classifier-training-config.yaml package <training-id>`.
+   To **stop** monitoring (but continue model training), press `Ctrl+C` once.
+ 
+   To **restart** monitoring, run the following command, replacing `<training-id>` with the id that was displayed when you started model training. 
+   
+      ```
+      ./train_max_model max-text-classifier-training-config.yaml package <training-id>
+      ```
+
+    > On Microsoft Windows run `python ./train_max_model max-text-classifier-training-config.yaml package <training-id>`
+  
+   To **cancel** the training run, press `Ctrl+C` twice.
 
    After training has completed the training log file `training-log.txt` is downloaded along with the trained model artifacts.
 
@@ -128,7 +183,7 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
    ....................................................................................
    ```
 
-   > If training was terminated early due to an error only the log file is downloaded. Inspect it to identify the problem.
+   If training was terminated early due to an error only the log file is downloaded. Inspect it to identify the problem.
 
    ```
    $ ls training_output/
@@ -137,13 +192,17 @@ The `wml_setup.py` script prepares your local environment and your IBM Cloud res
      training-log.txt 
    ```
 
-4. Return to the parent directory
+4. Return to the parent directory `$MODEL_REPO_HOME_DIR/training`.
 
-### Rebuild the Model-Serving Microservice
+   ```
+   $ cd ..
+   ```
 
-The model-serving microservice out of the box serves the pre-trained model which was trained on [insert_standard_dataset_here](dataset_URL). To serve the model trained on your dataset you have to rebuild the Docker image:
+## Rebuild the Model-Serving Microservice
 
-1. [Build the Docker image](https://docs.docker.com/engine/reference/commandline/build/):
+The model-serving microservice out of the box serves the pre-trained model which was trained on [IBM Claim Stance Dataset](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml). To serve the model trained on your dataset you have to rebuild the Docker image:
+
+1. Rebuild the Docker image. In `$MODEL_REPO_HOME_DIR` run
 
    ```
    $ docker build -t max-text-classifier --build-arg use_pre_trained_model=false . 
@@ -152,9 +211,8 @@ The model-serving microservice out of the box serves the pre-trained model which
    
    > If the optional parameter `use_pre_trained_model` is set to `true` or if the parameter is not defined the Docker image will be configured to serve the pre-trained model.
    
-2. Once the Docker image build completes start the microservice by [running the container](https://docs.docker.com/engine/reference/commandline/run/):
+ 2. Run the customized Docker image.
  
- ```
- $ docker run -it -p 5000:5000 max-text-classifier
- ...
- ```
+    ```
+    $ docker run -it -p 5000:5000 max-text-classifier
+    ```
