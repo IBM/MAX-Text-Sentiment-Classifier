@@ -204,7 +204,7 @@ The model-serving microservice out of the box serves the pre-trained model which
 1. Rebuild the Docker image. In `$MODEL_REPO_HOME_DIR` run
 
    ```
-   $ docker build -t max-text-classifier --build-arg use_pre_trained_model=false . 
+   $ docker build -t max-text-sentiment-classifier --build-arg use_pre_trained_model=false . 
     ...
    ```
    
@@ -213,5 +213,5 @@ The model-serving microservice out of the box serves the pre-trained model which
  2. Run the customized Docker image.
  
     ```
-    $ docker run -it -p 5000:5000 max-text-classifier
+    $ docker run -it -p 5000:5000 max-text-sentiment-classifier
     ```
