@@ -14,7 +14,6 @@ To prepare your data for training complete the steps listed in [data_preparation
 
 - [Install Local Prerequisites](#install-local-prerequisites)
 - [Run the Setup Script](#run-the-setup-script)
-- [Prepare Data for Training](#prepare-data-for-training)
 - [Customize Training](#customize-training)
 - [Train the Model Using Watson Machine Learning](#train-the-model-using-watson-machine-learning)
 
