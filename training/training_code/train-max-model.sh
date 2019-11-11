@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright 2018-2019 IBM Corp. All Rights Reserved.
 #
@@ -14,8 +15,6 @@
 # limitations under the License.
 #
 
-#!/bin/bash
-
 # uncomment to enable debug output
 #set -x
 
@@ -30,15 +29,18 @@ ENV_ERROR_RETURN_CODE=5
 #  Verify that the required environment variables are defined
 # --------------------------------------------------------------------
 
-# DATA_DIR identifies the directory where the training data is located.
+# DATA_DIR identifies the directory where the training assets are located.
 # The specified directory must exist and be readable.
 if [ -z ${DATA_DIR+x} ]; then
   echo "Error. Environment variable DATA_DIR is not defined."
   exit $ENV_ERROR_RETURN_CODE
 fi
 
+# Training data must be present in this directory
+DATA_DIR=${DATA_DIR}/data
+
 if [ ! -d ${DATA_DIR} ]; then 
-  echo "Error. Environment variable DATA_DIR (\"$DATA_DIR\") does not identify an existing directory."
+  echo "Error. Environment variable DATA_DIR (\"$DATA_DIR\") does not identify an existing data directory."
   exit $ENV_ERROR_RETURN_CODE
 fi
 
