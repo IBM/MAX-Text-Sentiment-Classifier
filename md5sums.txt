@@ -1,4 +1,0 @@
-64800d5d8528ce344256daf115d4965e  assets/vocab.txt
-392dcffc3adad2b3b6c612947425e93e  assets/saved_model.pb
-e39163e84cc2a44e5ab8e48745380f02  assets/variables/variables.index
-023a52bd6280831645defc5d2e88e5bc  assets/variables/variables.data-00000-of-00001
