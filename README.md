@@ -71,6 +71,8 @@ If you'd rather checkout and build the model locally you can follow the [run loc
 
 You can deploy the model-serving microservice on Red Hat OpenShift by following the instructions for the OpenShift web console or the OpenShift Container Platform CLI [in this tutorial](https://developer.ibm.com/tutorials/deploy-a-model-asset-exchange-microservice-on-red-hat-openshift/), specifying `codait/max-text-sentiment-classifier` as the image name.
 
+> Note that this model requires at least 4GB of RAM. Therefore this model will not run in a cluster that was provisioned under the [OpenShift Online starter plan](https://www.openshift.com/products/online/), which is capped at 2GB.
+
 ## Deploy on Kubernetes
 You can also deploy the model on Kubernetes using the latest docker image on Docker Hub.
 
