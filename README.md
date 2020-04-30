@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier) [![API demo](https://img.shields.io/website/http/max-text-sentiment-classifier.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=API%20demo&down_message=down&up_message=up)](http://max-text-sentiment-classifier.max.us-south.containers.appdomain.cloud/)
+[![Build Status](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier.svg?branch=master)](https://travis-ci.com/IBM/MAX-Text-Sentiment-Classifier) [![API demo](https://img.shields.io/website/http/max-text-sentiment-classifier.codait-prod-41208c73af8fca213512856c7a09db52-0000.us-east.containers.appdomain.cloud/swagger.json.svg?label=API%20demo&down_message=down&up_message=up)](http://max-text-sentiment-classifier.codait-prod-41208c73af8fca213512856c7a09db52-0000.us-east.containers.appdomain.cloud)
 
 [<img src="docs/deploy-max-to-ibm-cloud-with-kubernetes-button.png" width="400px">](http://ibm.biz/max-to-ibm-cloud-tutorial)
 
@@ -7,7 +7,7 @@
 This repository contains code to instantiate and deploy a text sentiment classifier. This model is able to detect whether a text fragment leans towards a positive or a negative sentiment. Optimal input examples for this model are short strings (preferably a single sentence) with correct grammar, although not a requirement.
 
 The model is based on the [pre-trained BERT-Base, English Uncased](https://github.com/google-research/bert/blob/master/README.md) model and was fine-tuned on the [IBM Claim Stance Dataset](http://www.research.ibm.com/haifa/dept/vst/debating_data.shtml). The model files are hosted on
-[IBM Cloud Object Storage](http://s3.us-south.cloud-object-storage.appdomain.cloud/max-assets-prod/max-text-sentiment-classifier/1.2.0/assets.tar.gz).
+[IBM Cloud Object Storage](https://max-cdn.cdn.appdomain.cloud/max-text-sentiment-classifier/1.2.0/assets.tar.gz).
 The code in this repository deploys the model as a web service in a Docker container. This repository was developed
 as part of the [IBM Developer Model Asset Exchange](https://developer.ibm.com/exchanges/models/) and the public API is powered by [IBM Cloud](https://ibm.biz/Bdz2XM).
 
@@ -150,16 +150,16 @@ Result:
 ```
 
 
-Use the ```model/predict``` endpoint to submit input text in json format. The json structure should have one key, ```text```, with as value a list of input strings to be analyzed. An example can be found in the image below.
+Use the `model/predict` endpoint to submit input text in json format. The json structure should have one key, `text`, with as value a list of input strings to be analyzed. An example can be found in the image below.
 
-Submitting proper json data triggers the model and will return a json file with a ```status``` and a ```predictions``` key. With this ```predictions``` field, a list of class labels and their corresponding probabilities will be associated. The first element in the list corresponds to the prediction for the first string in the input list.
+Submitting proper json data triggers the model and will return a json file with a `status` and a `predictions` key. With this `predictions` field, a list of class labels and their corresponding probabilities will be associated. The first element in the list corresponds to the prediction for the first string in the input list.
 
 
 ![Swagger UI Screenshot](docs/swagger-screenshot.png)
 
 You can also test it on the command line, for example:
 
-```
+```bash
 $ curl -d "{ \"text\": [ \"The Model Asset Exchange is a crucial element of a developer's toolkit.\" ]}" -X POST "http://localhost:5000/model/predict" -H "Content-Type: application/json"
 ```
 
@@ -187,7 +187,7 @@ To stop the Docker container, type `CTRL` + `C` in your terminal.
 
 ## Train this Model on Watson Machine Learning
 
-This model supports both fine-tuning with transfer learning and training from scratch on a custom dataset. Please follow the steps listed under the [training readme](training/README.md) to retrain the model on [Watson Machine Learning](https://www.ibm.com/cloud/machine-learning), a deep learning as a service offering of [IBM Cloud](https://ibm.biz/Bdz2XM).
+This model supports both fine-tuning with transfer learning and training from scratch on a custom dataset. Please follow the steps listed under the [training README](training/README.md) to retrain the model on [Watson Machine Learning](https://www.ibm.com/cloud/machine-learning), a deep learning as a service offering of [IBM Cloud](https://ibm.biz/Bdz2XM).
 
 ## Resources and Contributions
    
