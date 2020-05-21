@@ -49,7 +49,7 @@ class PaddingInputExample(object):
     the entire output data won't be generated.
 
     We use this class instead of `None` because treating `None` as padding
-    battches could cause silent errors.
+    batches could cause silent errors.
     """
 
 
@@ -116,7 +116,8 @@ class MAXAPIProcessor(DataProcessor):
         """See base class."""
 
         # Verify that the input is a list of strings
-        assert type(test_data) == list
+        if type(test_data) != list:
+            raise TypeError("'test_data' is type %r" % type(test_data))
         # Create InputExample objects from the input data
         return self._create_examples(test_data, "test")
 
@@ -214,9 +215,12 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
         input_mask.append(0)
         segment_ids.append(0)
 
-    assert len(input_ids) == max_seq_length
-    assert len(input_mask) == max_seq_length
-    assert len(segment_ids) == max_seq_length
+    if len(input_ids) != max_seq_length:
+        raise ValueError("'input_ids' has an incorrect length: %r" % len(input_ids))
+    if len(input_mask) != max_seq_length:
+        raise ValueError("'input_mask' has an incorrect length: %r" % len(input_mask))
+    if len(segment_ids) != max_seq_length:
+        raise ValueError("'segment_ids' has an incorrect length: %r" % len(segment_ids))
 
     label_id = label_map[example.label]
     if ex_index < 5:
