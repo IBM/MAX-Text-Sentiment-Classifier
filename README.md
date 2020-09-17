@@ -52,29 +52,29 @@ The generalization results (first row) are very good when the input data is simi
 
 # Deployment options
 
-* [Deploy from Docker Hub](#deploy-from-docker-hub)
+* [Deploy from Quay](#deploy-from-quay)
 * [Deploy on Red Hat OpenShift](#deploy-on-red-hat-openshift)
 * [Deploy on Kubernetes](#deploy-on-kubernetes)
 * [Run Locally](#run-locally)
 
-## Deploy from Docker Hub
+## Deploy from Quay
 To run the docker image, which automatically starts the model serving API, run:
 
 ```
-$ docker run -it -p 5000:5000 codait/max-text-sentiment-classifier
+$ docker run -it -p 5000:5000 quay.io/codait/max-text-sentiment-classifier
 ```
 
-This will pull a pre-built image from Docker Hub (or use an existing image if already cached locally) and run it.
+This will pull a pre-built image from the Quay.io container registry (or use an existing image if already cachedlocally) and run it.
 If you'd rather checkout and build the model locally you can follow the [run locally](#run-locally) steps below.
 
 ## Deploy on Red Hat OpenShift
 
-You can deploy the model-serving microservice on Red Hat OpenShift by following the instructions for the OpenShift web console or the OpenShift Container Platform CLI [in this tutorial](https://developer.ibm.com/tutorials/deploy-a-model-asset-exchange-microservice-on-red-hat-openshift/), specifying `codait/max-text-sentiment-classifier` as the image name.
+You can deploy the model-serving microservice on Red Hat OpenShift by following the instructions for the OpenShift web console or the OpenShift Container Platform CLI [in this tutorial](https://developer.ibm.com/tutorials/deploy-a-model-asset-exchange-microservice-on-red-hat-openshift/), specifying `quay.io/codait/max-text-sentiment-classifier` as the image name.
 
 > Note that this model requires at least 4GB of RAM. Therefore this model will not run in a cluster that was provisioned under the [OpenShift Online starter plan](https://www.openshift.com/products/online/), which is capped at 2GB.
 
 ## Deploy on Kubernetes
-You can also deploy the model on Kubernetes using the latest docker image on Docker Hub.
+You can also deploy the model on Kubernetes using the latest docker image on Quay.
 
 On your Kubernetes cluster, run the following commands:
 
