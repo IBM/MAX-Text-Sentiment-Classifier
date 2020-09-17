@@ -27,6 +27,6 @@ spec:
     spec:
       containers:
       - name: max-text-sentiment-classifier
-        image: codait/max-text-sentiment-classifier:latest
+        image: quay.io/codait/max-text-sentiment-classifier:latest
         ports:
         - containerPort: 5000
