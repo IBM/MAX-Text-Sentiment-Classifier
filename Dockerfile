@@ -14,12 +14,10 @@
 # limitations under the License.
 #
 
-FROM quay.io/codait/max-base:v1.3.2
+FROM quay.io/codait/max-base:v1.4.0
 
 ARG model_bucket=https://max-cdn.cdn.appdomain.cloud/max-text-sentiment-classifier/1.2.0
 ARG model_file=assets.tar.gz
-
-WORKDIR /workspace
 
 ARG use_pre_trained_model=true
 
@@ -29,10 +27,10 @@ RUN if [ "$use_pre_trained_model" = "true" ] ; then\
      tar -x -C assets/ -f assets/${model_file} -v && rm assets/${model_file} ; \
      fi
 
-COPY requirements.txt /workspace
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . /workspace
+COPY . .
 
 RUN if [ "$use_pre_trained_model" = "true" ] ; then \
       # validate downloaded pre-trained model assets
