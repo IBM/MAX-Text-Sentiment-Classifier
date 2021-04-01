@@ -21,4 +21,4 @@ from config import API_TITLE, API_DESC, API_VERSION
 max = MAXApp(API_TITLE, API_DESC, API_VERSION)
 max.add_api(ModelMetadataAPI, '/metadata')
 max.add_api(ModelPredictAPI, '/predict')
-max.run()
+app.run(debug=True, host='0.0.0.0', port=8080, use_reloader=True)
