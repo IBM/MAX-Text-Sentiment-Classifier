@@ -13,13 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-from maxfw.core import MAXApp
-from api import ModelMetadataAPI, ModelPredictAPI
-from config import API_TITLE, API_DESC, API_VERSION
-
-max = MAXApp(API_TITLE, API_DESC, API_VERSION)
-max.add_api(ModelMetadataAPI, '/metadata')
-max.add_api(ModelPredictAPI, '/predict')
-max.run()
-#app.run(debug=True, host='0.0.0.0', port=8080, use_reloader=True)
+from .app import MAXApp, MAX_API  # noqa
+from .api import *  # noqa
+from .utils import *  # noqa

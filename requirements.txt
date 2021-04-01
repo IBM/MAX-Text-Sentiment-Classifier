@@ -1,6 +1,5 @@
 # python3.6
-tensorflow == 1.15.4   # CPU Version of TensorFlow.
-# tensorflow-gpu  == 1.12.2  # GPU version of TensorFlow.
+tensorflow==1.15.4   # CPU Version of TensorFlow.
 flask-restx==0.1.1
 flask-cors==3.0.7
 maxfw==1.1.3

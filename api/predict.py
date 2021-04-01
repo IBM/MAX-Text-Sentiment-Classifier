@@ -18,6 +18,25 @@ from core.model import ModelWrapper
 from maxfw.core import MAX_API, PredictAPI
 from flask_restplus import fields
 from flask import abort
+import os 
+import urllib
+import tarfile
+
+download_base = 'https://max-cdn.cdn.appdomain.cloud/max-text-sentiment-classifier/1.2.0/'
+model_file = 'assets.tar.gz'
+
+#tar_path = os.path.join('assets/', model_file)
+
+if not os.path.exists(model_file):
+    print('Downloading model checkpoint...')
+    #opener = urllib.request.URLopener()
+    urllib.request.urlretrieve(download_base + model_file, model_file)
+else:
+    print('Model found.')
+
+with tarfile.open(model_file) as tar:
+     tar.extractall('assets/')
+     tar.close()
 
 # Set up parser for input data (http://flask-restplus.readthedocs.io/en/stable/parsing.html)
 input_parser = MAX_API.model('ModelInput', {

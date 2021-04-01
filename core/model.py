@@ -33,27 +33,6 @@ class ModelWrapper(MAXModelWrapper):
     MODEL_META_DATA = model_meta
 
     def __init__(self, path=DEFAULT_MODEL_PATH):
-  
-        download_base = 'https://max-cdn.cdn.appdomain.cloud/' \
-                    'max-object-detector/1.0.1/'
-        model_file = 'ssd_mobilenet_v1_coco_2018_01_28.tar.gz'
-
-        tar_path = os.path.join('assets/', model_file)
-
-        if not os.path.exists(tar_path):
-            print('Downloading model checkpoint...')
-            opener = urllib.request.URLopener()
-            opener.retrieve(download_base + model_file, tar_path)
-        else:
-            print('Model found.')
-
-        with tarfile.open(tar_path) as tar:
-            for member in tar.getmembers():
-                # Flatten the directory.
-                member.name = os.path.basename(member.name)
-                if 'model.ckpt' in member.name:
-                    print('Extracting {}...'.format(member.name))
-                    tar.extract(member, path='assets/')
 
         self.max_seq_length = 128
         self.do_lower_case = True
