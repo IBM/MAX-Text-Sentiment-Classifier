@@ -1,1 +1,1 @@
-We have removed support for training since TensorFlow v2. If you are interested in training, check out the last TensorFlow v1 of the training script at https://github.com/IBM/MAX-Sentiment-Classifier/tree/v2.1.0/training .
+We have removed support for training since TensorFlow v2. If you are interested in training, check out the last TensorFlow v1 of the training script at https://github.com/IBM/MAX-Text-Sentiment-Classifier/tree/v2.1.0/training .
