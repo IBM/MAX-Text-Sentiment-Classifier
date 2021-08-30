@@ -33,18 +33,20 @@ class ModelWrapper(MAXModelWrapper):
     MODEL_META_DATA = model_meta
 
     def __init__(self, path=DEFAULT_MODEL_PATH):
+        tf.compat.v1.disable_v2_behavior()
+
         logger.info('Loading model from: {}...'.format(path))
 
         self.max_seq_length = 128
         self.do_lower_case = True
 
         # Set Logging verbosity
-        tf.logging.set_verbosity(tf.logging.INFO)
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
         # Loading the tf Graph
         self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph)
-        tf.saved_model.loader.load(self.sess, [tag_constants.SERVING], DEFAULT_MODEL_PATH)
+        self.sess = tf.compat.v1.Session(graph=self.graph)
+        tf.compat.v1.saved_model.loader.load(self.sess, [tag_constants.SERVING], DEFAULT_MODEL_PATH)
 
         # Validate init_checkpoint
         tokenization.validate_case_matches_checkpoint(self.do_lower_case,
@@ -90,7 +92,7 @@ class ModelWrapper(MAXModelWrapper):
         for i in range(0, len(predict_examples), predict_batch_size):
             examples = predict_examples[i:i+predict_batch_size]
 
-            tf.logging.info(
+            tf.compat.v1.logging.info(
                 f"{i} out of {len(predict_examples)} examples done ({round(i * 100 / len(predict_examples))}%).")
 
             # Convert example to feature in batches.
