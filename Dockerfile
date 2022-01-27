@@ -16,7 +16,7 @@
 
 FROM quay.io/codait/max-base:v1.4.0
 
-ARG model_bucket=https://max-cdn.cdn.appdomain.cloud/max-text-sentiment-classifier/1.2.0
+ARG model_bucket=https://codait-cos-max.s3.us.cloud-object-storage.appdomain.cloud/max-text-sentiment-classifier/1.2.0
 ARG model_file=assets.tar.gz
 
 ARG use_pre_trained_model=true
